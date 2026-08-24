@@ -1,0 +1,1077 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --steel:#2D5F82;--steel-l:#4A7FA5;--steel-bg:#E8EEF4;--steel-md:#B8CDD9;
+  --dark:#1E3A52;--muted:#6B7280;--border:#D0D7E8;--slate:#F7F9FB;
+  --red:#B71C1C;--red-bg:#FAD7D7;--red-bd:#FECACA;
+  --green:#1A6B1A;--green-bg:#D6EFD8;--green-bd:#86EFAC;
+  --amber:#7A5000;--amber-bg:#FFF3CD;--amber-bd:#FCD34D;
+  --gold:#E8B000;
+}
+html,body{font-family:Arial,sans-serif;font-size:13px;color:var(--dark);background:#F0F2F7;margin:0;padding:0}
+
+/* ── FORM HEADER ── */
+.form-header{background:var(--dark);padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.fh-main{display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:10px 16px;gap:12px}
+.fh-logo{display:flex;align-items:center;gap:8px}
+.fh-logo-box{width:34px;height:34px;background:var(--steel);display:flex;align-items:center;justify-content:center;font-size:20px;color:#B5D4F4}
+.fh-logo-text{font-size:11px;font-weight:bold;color:#fff;line-height:1.2}
+.fh-logo-sub{font-size:9px;color:#7BA8C4;letter-spacing:.04em;text-transform:uppercase}
+.fh-center h1{font-size:14px;font-weight:bold;color:#fff;margin-bottom:1px}
+.fh-center p{font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em}
+.fh-stats{display:flex;gap:12px;align-items:center}
+.fh-stat{text-align:center}
+.fh-stat-val{font-size:16px;font-weight:bold;color:#fff;line-height:1}
+.fh-stat-lbl{font-size:8px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em}
+.fh-nc-val{color:var(--gold)}
+.prog-strip{height:3px;background:rgba(255,255,255,.15)}
+.prog-fill{height:100%;background:var(--gold);transition:width .4s;width:0%}
+
+/* ── RESULT KEY BANNER ── */
+.result-key{background:#2D5F82;padding:6px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rk-item{display:flex;align-items:center;gap:5px;font-size:10px}
+.rk-tog{height:22px;min-width:36px;padding:0 6px;border:0.5px solid;border-radius:0;font-size:9px;font-weight:bold;display:inline-flex;align-items:center;justify-content:center}
+.rk-yes{background:var(--red-bg);border-color:#E8B0B0;color:var(--red)}
+.rk-no{background:var(--green-bg);border-color:#86C890;color:var(--green)}
+.rk-na{background:#E8E8E8;border-color:#B0B0B0;color:#555}
+.rk-lbl{color:#B5D4F4;font-size:10px}
+
+/* ── AUDIT INFO ── */
+.audit-info{background:#fff;border-bottom:1px solid var(--border);padding:14px 16px}
+.sec-label{font-size:9px;font-weight:bold;color:var(--steel);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:bold}
+.field input,.field select{height:36px;font-size:12px;border:0.5px solid var(--border);border-radius:0;padding:0 10px;background:var(--slate);color:var(--dark);width:100%;font-family:Arial}
+.field input:focus,.field select:focus{outline:none;border-color:var(--steel);background:#fff}
+
+/* ── CATEGORY ── */
+.cat-sec{border-bottom:1px solid var(--border)}
+.cat-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;background:#fff;transition:background .1s}
+.cat-hdr:hover{background:var(--slate)}
+.cat-hdr-left{display:flex;align-items:center;gap:8px}
+.cat-dot{width:10px;height:10px;flex-shrink:0}
+.cat-name{font-size:13px;font-weight:bold;color:var(--dark)}
+.cat-tag{font-size:9px;font-weight:bold;padding:3px 8px;border-radius:0}
+.cat-hdr-right{display:flex;align-items:center;gap:10px}
+.cat-score{font-size:10px;color:var(--muted)}
+.cat-nc-badge{font-size:9px;font-weight:bold;padding:2px 7px;background:var(--red-bg);color:var(--red);border-radius:0;display:none}
+.cat-chev{font-size:16px;color:var(--muted);transition:transform .2s}
+.cat-body{padding:0 16px 12px;background:#fff}
+
+/* ── INSPECTION ITEM ── */
+.item{padding:12px 0;border-bottom:0.5px solid var(--border)}
+.item:last-child{border-bottom:none}
+.item-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.item-num{width:24px;height:24px;background:var(--steel-bg);color:var(--steel);font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.item-num.nc{background:var(--red-bg);color:var(--red)}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:13px;font-weight:bold;color:var(--dark);margin-bottom:2px}
+.item-hint{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ── TOGGLE GROUP ── */
+.tog-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.tog-instruct{font-size:8px;color:var(--red);font-weight:bold;text-align:right;white-space:nowrap}
+.tog-group{display:flex;gap:3px}
+.tog{height:32px;min-width:44px;padding:0 8px;border:0.5px solid var(--border);border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;background:var(--slate);color:var(--muted);transition:all .1s;font-family:Arial}
+.tog:hover{border-color:var(--steel);color:var(--steel)}
+.tog.yes{background:var(--red-bg);border-color:#E8B0B0;color:var(--red)}
+.tog.no{background:var(--green-bg);border-color:#86C890;color:var(--green)}
+.tog.na{background:#E8E8E8;border-color:#B0B0B0;color:#555}
+
+/* ── CA CARDS CONTAINER ── */
+.ca-cards-wrap{margin-top:8px}
+
+/* ── INDIVIDUAL CA CARD ── */
+.ca-card{background:#FFFBF0;border:1px solid var(--amber-bd);border-left:3px solid var(--gold);padding:12px;margin-bottom:8px;position:relative}
+.ca-card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ca-card-num{font-size:10px;font-weight:bold;color:var(--amber);display:flex;align-items:center;gap:5px}
+.ca-card-right{display:flex;align-items:center;gap:8px}
+.ca-defer-wrap{display:flex;align-items:center;gap:5px}
+.ca-defer-wrap input[type=checkbox]{width:14px;height:14px;accent-color:var(--steel);cursor:pointer}
+.ca-defer-wrap label{font-size:10px;color:var(--amber);cursor:pointer}
+.btn-remove-card{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:0 2px;line-height:1}
+.btn-remove-card:hover{color:var(--red)}
+.ca-body{display:flex;flex-direction:column;gap:8px}
+.ca-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ca-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.caf{display:flex;flex-direction:column;gap:3px}
+.caf.full{grid-column:1/-1}
+.caf label{font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.04em;font-weight:bold}
+.caf input,.caf select,.caf textarea{font-size:11px;border:0.5px solid var(--amber-bd);border-radius:0;padding:5px 8px;background:#fff;color:var(--dark);font-family:Arial;width:100%}
+.caf textarea{height:60px;resize:vertical}
+.caf input:focus,.caf select:focus,.caf textarea:focus{outline:none;border-color:var(--gold)}
+.ca-id-display{font-family:monospace;font-size:11px;font-weight:bold;color:var(--steel);background:var(--steel-bg);padding:5px 8px;border:0.5px solid var(--steel-md)}
+
+/* ── LOCATION + PILLS (inside CA card) ── */
+.loc-row{display:flex;align-items:center;gap:6px}
+.loc-row input{flex:1;height:30px;font-size:11px;border:0.5px solid var(--amber-bd);border-radius:0;padding:0 8px;background:#fff;color:var(--dark);font-family:Arial}
+.loc-row input:focus{outline:none;border-color:var(--gold);background:#fff}
+.loc-icon{font-size:14px;color:var(--muted);flex-shrink:0}
+.pills-label{font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.pill{font-size:11px;padding:4px 8px;border:0.5px solid var(--amber-bd);border-radius:0;cursor:pointer;background:#fff;color:var(--amber);transition:all .1s;user-select:none}
+.pill:hover{border-color:var(--gold);background:#FFF3D0}
+.pill.sel-nc{background:var(--red-bg);border-color:#E8B0B0;color:var(--red);font-weight:bold}
+.note-label{font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.note-field{width:100%;height:44px;font-size:11px;border:0.5px solid var(--amber-bd);border-radius:0;padding:6px 8px;resize:vertical;background:#fff;color:var(--dark);font-family:Arial}
+.note-field:focus{outline:none;border-color:var(--gold)}
+
+/* ── NC LEVEL PILLS ── */
+.lvl-pills{display:flex;gap:4px;flex-wrap:wrap}
+.lp{height:28px;padding:0 10px;border:0.5px solid;border-radius:0;font-size:10px;font-weight:bold;cursor:pointer;font-family:Arial;display:flex;align-items:center;transition:all .1s}
+.lp-c{border-color:#FECACA;background:#FEF2F2;color:#991B1B}
+.lp-c:hover,.lp-c.sel{background:var(--red-bg);border-color:#E24B4A;border-width:2px}
+.lp-m{border-color:#FCD34D;background:#FFF3CD;color:#7A5000}
+.lp-m:hover,.lp-m.sel{background:#FEE9A0;border-color:#BA7517;border-width:2px}
+.lp-n{border-color:#BFDBFE;background:#EFF6FF;color:#1E40AF}
+.lp-n:hover,.lp-n.sel{background:#DBEAFE;border-color:#378ADD;border-width:2px}
+.lp-o{border-color:#D1D5DB;background:#F5F5F5;color:#555}
+.lp-o:hover,.lp-o.sel{background:#E5E7EB;border-color:#888;border-width:2px}
+
+/* ── PHOTO ── */
+.photo-area{display:flex;flex-direction:column;gap:4px}
+.photo-btn{width:100%;height:38px;border:1.5px dashed var(--amber-bd);border-radius:0;background:#fff;color:var(--amber);font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:Arial}
+.photo-btn:hover{background:#FFF8E0}
+.photo-btn input[type=file]{display:none}
+.photo-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.photo-thumb{position:relative;width:60px;height:60px}
+.photo-thumb img{width:60px;height:60px;object-fit:cover;border:0.5px solid var(--amber-bd)}
+.photo-rm{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:var(--red);color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.ca-deferred-msg{background:var(--steel-bg);border:0.5px solid var(--steel-md);padding:8px 10px;font-size:10px;color:var(--steel);display:none;align-items:center;gap:6px}
+
+/* ── ADD FINDING BUTTON ── */
+.btn-add-finding{width:100%;height:36px;border:1.5px dashed var(--amber-bd);border-radius:0;background:#FFFBF0;color:var(--amber);font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:Arial;margin-top:4px}
+.btn-add-finding:hover{background:#FFF3D0;border-color:var(--gold)}
+
+/* ── SUBMIT ── */
+.submit-area{background:#fff;padding:16px;border-top:1px solid var(--border);position:sticky;bottom:0;box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.nc-summary-bar{background:var(--red-bg);border:0.5px solid var(--red-bd);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.nc-summary-bar.clean{background:var(--green-bg);border-color:var(--green-bd)}
+.nc-sum-left .nc-count{font-size:16px;font-weight:bold;color:var(--red)}
+.nc-summary-bar.clean .nc-count{color:var(--green)}
+.nc-sum-left .nc-sub{font-size:10px;color:#B04040}
+.nc-summary-bar.clean .nc-sub{color:var(--green)}
+.nc-sum-cats{display:flex;gap:8px}
+.nc-cat-pill{font-size:10px;padding:2px 8px;border-radius:0;font-weight:bold}
+.submit-note{font-size:10px;color:var(--muted);margin-bottom:10px;text-align:center}
+.btn-row{display:flex;gap:8px}
+.btn-submit{flex:1;height:44px;background:var(--dark);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-submit:hover{background:var(--steel)}
+.btn-submit:disabled{background:#888;cursor:not-allowed}
+
+/* ── TOAST + OVERLAY ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:0;font-size:12px;font-weight:bold;z-index:999;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.toast.show{display:block}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.spinner-box{background:#fff;padding:30px 40px;text-align:center}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--steel);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-msg{font-size:12px;color:var(--muted)}
+
+/* ── REVIEW & SCHEDULE-NEXT OVERLAYS ── */
+.rv-box{background:#fff;width:640px;max-width:92vw;max-height:86vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.rv-hdr{background:var(--dark);padding:14px 18px}
+.rv-hdr-title{font-size:14px;font-weight:bold;color:#fff}
+.rv-hdr-sub{font-size:10px;color:#B5D4F4;margin-top:2px}
+.rv-body{padding:16px 18px}
+.rv-sec{margin-bottom:16px}
+.rv-sec-title{font-size:10px;font-weight:bold;color:var(--steel);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding-bottom:5px;border-bottom:0.5px solid var(--border)}
+.rv-row{display:flex;gap:8px;margin-bottom:6px;font-size:12px}
+.rv-lbl{color:var(--muted);width:130px;flex-shrink:0}
+.rv-val{color:var(--dark);font-weight:500;flex:1}
+.rv-finding{background:var(--slate);border:0.5px solid var(--border);border-left:3px solid var(--gold);padding:8px 10px;margin-bottom:6px;font-size:11px}
+.rv-finding-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.rv-finding-item{font-weight:bold;color:var(--dark)}
+.rv-finding-detail{color:var(--muted);line-height:1.5}
+.rv-empty{font-size:11px;color:var(--muted);font-style:italic}
+.rv-footer{padding:12px 18px;border-top:.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--slate)}
+.btn-rv-back{padding:8px 16px;background:#fff;color:var(--muted);border:.5px solid var(--border);border-radius:0;font-size:12px;cursor:pointer;font-family:Arial}
+.btn-rv-confirm{padding:8px 20px;background:var(--dark);color:#fff;border:none;border-radius:0;font-size:12px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-rv-confirm:hover{background:var(--steel)}
+
+.sched-box{background:#fff;padding:24px 28px;text-align:center;width:380px;max-width:90vw}
+.sched-check{font-size:30px;margin-bottom:8px}
+.sched-title{font-size:14px;font-weight:bold;color:var(--dark);margin-bottom:4px}
+.sched-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.sched-ask{font-size:12px;color:var(--dark);margin-bottom:14px}
+.sched-row{display:flex;gap:8px}
+.sched-row button{flex:1;height:38px;border:none;border-radius:0;font-size:12px;font-weight:bold;cursor:pointer;font-family:Arial}
+.sched-field{text-align:left;margin-bottom:14px}
+.sched-field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:bold;display:block;margin-bottom:4px}
+.sched-field input{height:36px;font-size:12px;border:0.5px solid var(--border);border-radius:0;padding:0 10px;background:var(--slate);color:var(--dark);width:100%;font-family:Arial}
+</style>
+
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay"><div class="spinner-box"><div class="spinner"></div><div class="spinner-msg" id="spinMsg">Submitting audit…</div></div></div>
+
+<!-- REVIEW BEFORE SUBMIT -->
+<div class="overlay" id="reviewOverlay">
+  <div class="rv-box">
+    <div class="rv-hdr"><div class="rv-hdr-title">Review before submitting</div><div class="rv-hdr-sub">Check everything below, then confirm to save this audit and create CA records.</div></div>
+    <div class="rv-body" id="reviewBody"></div>
+    <div class="rv-footer">
+      <button class="btn-rv-back" onclick="closeReviewOverlay()">&#8592; Go back &amp; edit</button>
+      <button class="btn-rv-confirm" onclick="confirmSubmit()">Confirm &amp; submit &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST-SUBMIT: SCHEDULE NEXT AUDIT -->
+<div class="overlay" id="scheduleOverlay">
+  <div class="sched-box">
+    <div class="sched-check">✅</div>
+    <div class="sched-title">Audit submitted successfully</div>
+    <div class="sched-sub" id="scheduleSubMsg"></div>
+    <div id="scheduleAskBlock">
+      <div class="sched-ask">Schedule the next audit for this zone now?</div>
+      <div class="sched-row">
+        <button style="background:var(--slate);border:0.5px solid var(--border);color:var(--muted)" onclick="closeScheduleOverlay()">Not now</button>
+        <button style="background:var(--dark);color:#fff" onclick="showScheduleDateField()">Yes, schedule &rarr;</button>
+      </div>
+    </div>
+    <div id="scheduleFieldsBlock" style="display:none">
+      <div class="sched-field"><label>Next audit date</label><input type="date" id="nextAuditDate"></div>
+      <div class="sched-row">
+        <button style="background:var(--slate);border:0.5px solid var(--border);color:var(--muted)" onclick="closeScheduleOverlay()">Cancel</button>
+        <button style="background:var(--dark);color:#fff" onclick="confirmScheduleNext()">Schedule &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM HEADER -->
+<div class="form-header">
+  <div class="fh-main">
+    <div class="fh-logo">
+      <div class="fh-logo-box">📋</div>
+      <div>
+        <div class="fh-logo-text">Container Supply Co.</div>
+        <div class="fh-logo-sub">FRM-018-002 · Rev. 0</div>
+      </div>
+    </div>
+    <div class="fh-center">
+      <h1>Facility Self Inspection Form</h1>
+      <p>Garden Grove, CA &nbsp;·&nbsp; QA/QC Program</p>
+    </div>
+    <div class="fh-stats">
+      <div class="fh-stat"><div class="fh-stat-val" id="hChecked">0/15</div><div class="fh-stat-lbl">Checked</div></div>
+      <div class="fh-stat"><div class="fh-stat-val fh-nc-val" id="hNC">0</div><div class="fh-stat-lbl">NC Found</div></div>
+    </div>
+  </div>
+  <div class="prog-strip"><div class="prog-fill" id="progFill"></div></div>
+</div>
+
+<!-- RESULT KEY -->
+<div class="result-key">
+  <span style="font-size:10px;font-weight:bold;color:#fff">Result key:</span>
+  <div class="rk-item"><span class="rk-tog rk-yes">Yes</span><span class="rk-lbl">= Nonconformance found — CA required</span></div>
+  <div class="rk-item"><span class="rk-tog rk-no">No</span><span class="rk-lbl">= Passed inspection — no issue</span></div>
+  <div class="rk-item"><span class="rk-tog rk-na">N/A</span><span class="rk-lbl">= Not applicable to this zone</span></div>
+</div>
+
+<!-- AUDIT INFO -->
+<div class="audit-info">
+  <div class="sec-label">Audit information</div>
+  <div class="fg2">
+    <div class="field"><label>Audit date</label><input type="date" id="auditDate" required onchange="refreshAllDueDates()"></div>
+    <div class="field"><label>Zone</label>
+      <select id="zoneSelect" required onchange="onZoneChange(this.value)">
+        <option value="">Select zone…</option>
+        <option value="1">Zone 1 – Shipping &amp; Receiving</option>
+        <option value="2">Zone 2 – Metals</option>
+        <option value="3">Zone 3 – Plastics</option>
+        <option value="4">Zone 4 – Lithography</option>
+        <option value="5">Zone 5 – Miscellaneous</option>
+      </select>
+    </div>
+  </div>
+  <div class="fg2">
+    <div class="field"><label>Audit coordinator</label><input type="text" id="coordinator" placeholder="QA or Compliance Manager"></div>
+    <div class="field"><label>Zone auditor / designee</label><input type="text" id="designee" placeholder="Dept. lead or designee name"></div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div id="checklistRoot"></div>
+
+<!-- SUBMIT -->
+<div class="submit-area">
+  <div class="nc-summary-bar clean" id="ncSummaryBar">
+    <div class="nc-sum-left">
+      <div class="nc-count" id="ncSumCount">0 nonconformances</div>
+      <div class="nc-sub" id="ncSumSub">No findings — all items passing</div>
+    </div>
+    <div class="nc-sum-cats" id="ncSumCats"></div>
+  </div>
+  <div class="submit-note">Submitting logs this walkthrough and creates one CA record per finding.</div>
+  <div class="btn-row">
+    <button class="btn-submit" id="btnSubmit" onclick="submitAudit()">Submit audit &rarr;</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────
+var pillsByItem  = {};
+// results[itemNum] = {result:'yes'|'no'|'na', findings:[{location,pills,note,ncLevel,description,responsiblePerson,assignedBy,deferred,photos}]}
+var results      = {};
+var nextCarSeq   = 1;
+var submitting   = false;
+
+var ITEMS = [
+  {num:1,  cat:'Maintenance', name:'Building exterior & grounds',   hint:'Perimeter walk — weeds, litter, standing water, debris at docks'},
+  {num:2,  cat:'Maintenance', name:'Roof, walls & doors',           hint:'Doors seal fully, no holes in walls, no water intrusion'},
+  {num:3,  cat:'Maintenance', name:'Lighting & ventilation',        hint:'Burned-out lights, blocked or non-functioning vents'},
+  {num:4,  cat:'Maintenance', name:'Equipment condition',           hint:'No temp repairs, no improvised guards, no product buildup'},
+  {num:5,  cat:'Sanitation',  name:'Floors, walls & ceilings',      hint:'Resin pellets, residue, cracked flooring, damaged ceiling tiles'},
+  {num:6,  cat:'Sanitation',  name:'Waste containment & removal',   hint:'Bins not overflowing, lids in place, labels intact'},
+  {num:7,  cat:'Sanitation',  name:'Handwashing & hygiene',         hint:'Observe employees, stations stocked, GMP compliance'},
+  {num:8,  cat:'GMP',         name:'Pest control devices',          hint:'All stations present, secured, undamaged, no pest evidence'},
+  {num:9,  cat:'GMP',         name:'Food, drink & personal items',  hint:'No consumables on production floor, no bags on equipment'},
+  {num:10, cat:'GMP',         name:'Tools & equipment storage',     hint:'No tools on floor, no rags on rails — check every line'},
+  {num:11, cat:'GMP',         name:'Personal protective equipment', hint:'Hair nets worn (incl. forklift drivers), gloves, safety footwear'},
+  {num:12, cat:'GMP',         name:'Product & materials storage',   hint:'Product on pallets, no blocking exits, all containers labeled'},
+  {num:13, cat:'Safety',      name:'First aid kit',                 hint:'Accessible and in good condition — N/A if none assigned'},
+  {num:14, cat:'Safety',      name:'Eye wash station',              hint:'Accessible and in good condition — N/A if none assigned'},
+  {num:15, cat:'Safety',      name:'Machine guards & covers',       hint:'In place and in good condition'},
+];
+var CATS = ['Maintenance','Sanitation','GMP','Safety'];
+var CAT_META = {
+  'Maintenance': {color:'#4A7FA5',bg:'#EAF0F6',fg:'#1A4A6E',items:[1,2,3,4]},
+  'Sanitation':  {color:'#5DA37A',bg:'#EAF5F0',fg:'#0D5C3A',items:[5,6,7]},
+  'GMP':         {color:'#7F77DD',bg:'#F0EDF8',fg:'#3D1F7A',items:[8,9,10,11,12]},
+  'Safety':      {color:'#D85A30',bg:'#FDF0EA',fg:'#7A2A0D',items:[13,14,15]},
+};
+
+ITEMS.forEach(function(it){
+  results[it.num] = { result: null, findings: [] };
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+window.onload = function() {
+  var today = new Date();
+  document.getElementById('auditDate').value =
+    today.getFullYear() + '-' +
+    String(today.getMonth()+1).padStart(2,'0') + '-' +
+    String(today.getDate()).padStart(2,'0');
+
+  google.script.run
+    .withSuccessHandler(function(data) {
+      (data||[]).forEach(function(row) {
+        var n = parseInt(row.item_num);
+        if (!pillsByItem[n]) pillsByItem[n] = [];
+        pillsByItem[n].push(row.pill_text);
+      });
+      renderChecklist();
+      loadNextSeq();
+    })
+    .withFailureHandler(function() {
+      renderChecklist();
+      loadNextSeq();
+    })
+    .getPillLibrary();
+};
+
+function loadNextSeq() {
+  google.script.run
+    .withSuccessHandler(function(seq){ nextCarSeq = seq || 1; refreshAllCarIds(); })
+    .withFailureHandler(function(){})
+    .getNextCarSeq();
+}
+
+function onZoneChange() { loadNextSeq(); }
+
+// ── RENDER CHECKLIST ──────────────────────────────────────────
+function renderChecklist() {
+  var root = document.getElementById('checklistRoot');
+  var html = '';
+  CATS.forEach(function(cat) {
+    var meta      = CAT_META[cat];
+    var catItems  = ITEMS.filter(function(it){ return it.cat === cat; });
+    var nums      = meta.items;
+    html += '<div class="cat-sec" id="cat-'+cat+'">';
+    html += '<div class="cat-hdr" onclick="toggleCat(\''+cat+'\')">';
+    html += '<div class="cat-hdr-left">';
+    html += '<div class="cat-dot" style="background:'+meta.color+'"></div>';
+    html += '<span class="cat-name">'+cat+'</span>';
+    html += '<span class="cat-tag" style="background:'+meta.bg+';color:'+meta.fg+'">'+catItems.length+' items · nos. '+nums[0]+'–'+nums[nums.length-1]+'</span>';
+    html += '</div><div class="cat-hdr-right">';
+    html += '<span class="cat-score" id="score-'+cat+'">0/'+catItems.length+'</span>';
+    html += '<span class="cat-nc-badge" id="ncbadge-'+cat+'">0 NC</span>';
+    html += '<span class="cat-chev" id="chev-'+cat+'">▼</span>';
+    html += '</div></div>';
+    html += '<div class="cat-body" id="body-'+cat+'">';
+    catItems.forEach(function(it){ html += renderItem(it); });
+    html += '</div></div>';
+  });
+  root.innerHTML = html;
+}
+
+function renderItem(it) {
+  var h = '<div class="item" id="item-'+it.num+'">';
+  h += '<div class="item-hdr">';
+  h += '<div class="item-num" id="num-'+it.num+'">'+it.num+'</div>';
+  h += '<div class="item-info"><div class="item-name">'+esc(it.name)+'</div><div class="item-hint">'+esc(it.hint)+'</div></div>';
+  h += '<div class="tog-wrap">';
+  h += '<div class="tog-instruct">Yes = NC found</div>';
+  h += '<div class="tog-group">';
+  h += '<button class="tog" onclick="setResult('+it.num+',\'yes\',this)" title="Nonconformance found — CA required">Yes</button>';
+  h += '<button class="tog" onclick="setResult('+it.num+',\'no\',this)" title="Passed inspection">No</button>';
+  h += '<button class="tog" onclick="setResult('+it.num+',\'na\',this)" title="Not applicable">N/A</button>';
+  h += '</div></div></div>';
+  h += '<div class="ca-cards-wrap" id="cards-'+it.num+'" style="display:none"></div>';
+  h += '</div>';
+  return h;
+}
+
+// ── TOGGLE CAT ────────────────────────────────────────────────
+function toggleCat(cat) {
+  var body = document.getElementById('body-'+cat);
+  var chev = document.getElementById('chev-'+cat);
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.textContent   = open ? '▶' : '▼';
+}
+
+// ── SET RESULT (Yes/No/NA) ────────────────────────────────────
+function setResult(num, val, btn) {
+  var group = btn.closest('.tog-group');
+  group.querySelectorAll('.tog').forEach(function(b){ b.className = 'tog'; });
+  btn.classList.add(val);
+  var prev = results[num].result;
+  results[num].result = val;
+
+  var numEl = document.getElementById('num-'+num);
+  numEl.className = 'item-num' + (val === 'yes' ? ' nc' : '');
+
+  var cardsWrap = document.getElementById('cards-'+num);
+  if (val === 'yes') {
+    cardsWrap.style.display = 'block';
+    // Add first finding card if none exist
+    if (results[num].findings.length === 0) {
+      addFinding(num);
+    }
+  } else {
+    cardsWrap.style.display = 'none';
+    // Clear findings if switching away from Yes
+    results[num].findings = [];
+    cardsWrap.innerHTML = '';
+  }
+
+  updateProgress();
+  updateCatScore(num);
+  updateSummaryBar();
+}
+
+// ── ADD FINDING ───────────────────────────────────────────────
+function addFinding(itemNum) {
+  var idx = results[itemNum].findings.length;
+
+  // Add blank state
+  results[itemNum].findings.push({
+    location: '', pills: [], note: '',
+    ncLevel: 'Minor', description: '',
+    responsiblePerson: '', assignedBy: '',
+    deferred: false, photos: []
+  });
+
+  renderFindingCard(itemNum, idx);
+  refreshAllCarIds();
+  updateSummaryBar();
+}
+
+// ── RENDER A FINDING CARD FROM EXISTING STATE ──────────────────
+// Used both for brand-new (blank) findings and for re-rendering
+// surviving findings after one is removed — never wipes data.
+function renderFindingCard(itemNum, idx) {
+  var f          = results[itemNum].findings[idx];
+  var findingId  = 'f-' + itemNum + '-' + idx;
+  var cardsWrap  = document.getElementById('cards-'+itemNum);
+  var pills      = pillsByItem[itemNum] || [];
+  var cardNum    = idx + 1;
+
+  var html = '<div class="ca-card" id="'+findingId+'">';
+  html += '<div class="ca-card-hdr">';
+  html += '<div class="ca-card-num">⚠ Finding #'+cardNum+' &nbsp;<span style="font-size:9px;background:#FFF3CD;color:#7A5000;padding:2px 6px;font-weight:normal">Optional — fill now or after walkthrough</span></div>';
+  html += '<div class="ca-card-right">';
+  html += '<div class="ca-defer-wrap"><input type="checkbox" id="defer-'+findingId+'"'+(f.deferred?' checked':'')+' onchange="toggleDefer(\''+findingId+'\',this.checked)"><label for="defer-'+findingId+'">Defer details</label></div>';
+  if (idx > 0) {
+    html += '<button class="btn-remove-card" onclick="removeFinding('+itemNum+','+idx+')" title="Remove this finding">&times;</button>';
+  }
+  html += '</div></div>';
+
+  html += '<div class="ca-body" id="body-'+findingId+'">';
+
+  // CAR ID + NC Level + Due Date
+  html += '<div class="ca-row-3">';
+  html += '<div class="caf"><label>CAR ID</label><div class="ca-id-display" id="carid-'+findingId+'">Assigned on submit</div></div>';
+  html += '<div class="caf"><label>NC Level</label><div class="lvl-pills">';
+  html += '<button class="lp lp-c'+(f.ncLevel==='Critical'?' sel':'')+'" onclick="setLevel(\''+findingId+'\','+itemNum+','+idx+',\'Critical\',this)">Critical</button>';
+  html += '<button class="lp lp-m'+(f.ncLevel==='Major'?' sel':'')+'" onclick="setLevel(\''+findingId+'\','+itemNum+','+idx+',\'Major\',this)">Major</button>';
+  html += '<button class="lp lp-n'+(f.ncLevel==='Minor'?' sel':'')+'" onclick="setLevel(\''+findingId+'\','+itemNum+','+idx+',\'Minor\',this)">Minor</button>';
+  html += '<button class="lp lp-o'+(f.ncLevel==='Observation'?' sel':'')+'" onclick="setLevel(\''+findingId+'\','+itemNum+','+idx+',\'Observation\',this)">Obs</button>';
+  html += '</div></div>';
+  html += '<div class="caf"><label>Due Date</label><div class="ca-id-display" id="duedate-'+findingId+'">'+computeDueDateLabel(f.ncLevel)+'</div></div>';
+  html += '</div>';
+
+  // Location
+  html += '<div class="loc-row"><span class="loc-icon">📍</span>';
+  html += '<input type="text" value="'+esc(f.location)+'" placeholder="Location within zone (e.g. Line 3, palletizer 2)" oninput="setFindingLocation('+itemNum+','+idx+',this.value)"></div>';
+
+  // Pills
+  if (pills.length > 0) {
+    html += '<div class="pills-label">Observations — tap all that apply</div>';
+    html += '<div class="pills" id="pills-'+findingId+'">';
+    pills.forEach(function(p) {
+      var isSel = f.pills && f.pills.indexOf(p) !== -1;
+      html += '<span class="pill'+(isSel?' sel-nc':'')+'" onclick="togPill(\''+findingId+'\','+itemNum+','+idx+',this,\''+esc(p)+'\')">'+esc(p)+'</span>';
+    });
+    html += '</div>';
+  }
+
+  // Notes
+  html += '<div class="note-label">Additional notes</div>';
+  html += '<textarea class="note-field" placeholder="Add detail, context, or equipment number — optional" oninput="setFindingNote('+itemNum+','+idx+',this.value)">'+esc(f.note)+'</textarea>';
+
+  // Description
+  html += '<div class="caf full"><label>Description (auto-filled)</label>';
+  html += '<textarea id="desc-'+findingId+'" oninput="setFindingDesc('+itemNum+','+idx+',this.value)" placeholder="Auto-fills from location + observations above">'+esc(f.description)+'</textarea></div>';
+
+  // Responsible + Assigned
+  html += '<div class="ca-row">';
+  html += '<div class="caf"><label>Responsible person</label><input type="text" value="'+esc(f.responsiblePerson)+'" placeholder="Name" oninput="setFindingResp('+itemNum+','+idx+',this.value)"></div>';
+  html += '<div class="caf"><label>Assigned by</label><input type="text" value="'+esc(f.assignedBy)+'" placeholder="Dept. head" oninput="setFindingAsgn('+itemNum+','+idx+',this.value)"></div>';
+  html += '</div>';
+
+  // Photo
+  html += '<div class="photo-area">';
+  html += '<label for="photo-'+findingId+'" class="photo-btn">📷 Add photo — tap to take or upload';
+  html += '<input type="file" id="photo-'+findingId+'" accept="image/*" capture="environment" multiple onchange="addPhotos('+itemNum+','+idx+',this)"></label>';
+  html += '<div class="photo-preview" id="thumbs-'+findingId+'"></div>';
+  html += '</div>';
+
+  html += '<div class="ca-deferred-msg" id="deferred-msg-'+findingId+'">⏱ Details deferred — complete in tracker after walkthrough.</div>';
+  html += '</div>'; // end ca-body
+  html += '</div>'; // end ca-card
+
+  // Insert before the add button if it exists, otherwise append
+  var addBtn = cardsWrap.querySelector('.btn-add-finding');
+  var temp   = document.createElement('div');
+  temp.innerHTML = html;
+  var newCard = temp.firstChild;
+
+  if (addBtn) {
+    cardsWrap.insertBefore(newCard, addBtn);
+  } else {
+    cardsWrap.appendChild(newCard);
+    // Add the "+ Add another finding" button
+    var btnHtml = '<button class="btn-add-finding" onclick="addFinding('+itemNum+')">+ Add another finding for this item</button>';
+    cardsWrap.insertAdjacentHTML('beforeend', btnHtml);
+  }
+
+  // Restore photo thumbnails and deferred-collapsed state
+  renderThumbs(itemNum, idx, findingId);
+  applyDeferredDisplay(findingId, !!f.deferred);
+}
+
+// ── REMOVE FINDING ────────────────────────────────────────────
+function removeFinding(itemNum, idx) {
+  results[itemNum].findings.splice(idx, 1);
+  var cardsWrap = document.getElementById('cards-'+itemNum);
+  cardsWrap.innerHTML = '';
+
+  if (results[itemNum].findings.length === 0) {
+    // Shouldn't happen (the remove button never shows on finding #1),
+    // but keep the item usable if it ever does.
+    addFinding(itemNum);
+    return;
+  }
+
+  // Re-render every surviving finding from its own real data — nothing is blanked.
+  results[itemNum].findings.forEach(function(f, i) { renderFindingCard(itemNum, i); });
+  refreshAllCarIds();
+  updateSummaryBar();
+}
+
+// ── FINDING STATE SETTERS ─────────────────────────────────────
+function setFindingLocation(itemNum, idx, val) {
+  if (!results[itemNum].findings[idx]) return;
+  results[itemNum].findings[idx].location = val;
+  autoFillDesc(itemNum, idx);
+}
+function setFindingNote(itemNum, idx, val) {
+  if (!results[itemNum].findings[idx]) return;
+  results[itemNum].findings[idx].note = val;
+  autoFillDesc(itemNum, idx);
+}
+function setFindingDesc(itemNum, idx, val) {
+  if (!results[itemNum].findings[idx]) return;
+  results[itemNum].findings[idx].description = val;
+}
+function setFindingResp(itemNum, idx, val) {
+  if (!results[itemNum].findings[idx]) return;
+  results[itemNum].findings[idx].responsiblePerson = val;
+}
+function setFindingAsgn(itemNum, idx, val) {
+  if (!results[itemNum].findings[idx]) return;
+  results[itemNum].findings[idx].assignedBy = val;
+}
+
+function setLevel(findingId, itemNum, idx, level, btn) {
+  var group = btn.closest('.lvl-pills');
+  group.querySelectorAll('.lp').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  if (results[itemNum].findings[idx]) results[itemNum].findings[idx].ncLevel = level;
+  var dd = document.getElementById('duedate-'+findingId);
+  if (dd) dd.textContent = computeDueDateLabel(level);
+}
+
+// ── DUE DATE PREVIEW ────────────────────────────────────────────
+// Mirrors getDueDate()/addWorkdays() in FacilityAuditCode.gs so the form
+// can show the due date live as the auditor picks an NC level, instead of
+// only computing it silently on the server at submit time.
+function parseDateInputLocal_(v) {
+  if (!v) return null;
+  var parts = v.split('-');
+  if (parts.length !== 3) return null;
+  return new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+}
+function addWorkdaysClient_(startDate, workdays) {
+  var d = new Date(startDate.getTime());
+  var added = 0;
+  while (added < workdays) {
+    d.setDate(d.getDate() + 1);
+    var day = d.getDay();
+    if (day !== 0 && day !== 6) added++;
+  }
+  return d;
+}
+function getDueDateClient_(dateObj, ncLevel) {
+  if (!dateObj) return null;
+  if (ncLevel === 'Critical') return dateObj;
+  if (ncLevel === 'Major')    return addWorkdaysClient_(dateObj, 14);
+  if (ncLevel === 'Minor')    return addWorkdaysClient_(dateObj, 29);
+  return null; // Observation — no due date
+}
+function computeDueDateLabel(ncLevel) {
+  var d = parseDateInputLocal_(document.getElementById('auditDate').value);
+  if (!d) return '—';
+  var due = getDueDateClient_(d, ncLevel);
+  if (!due) return 'N/A';
+  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return M[due.getMonth()]+' '+due.getDate()+', '+due.getFullYear();
+}
+function refreshAllDueDates() {
+  ITEMS.forEach(function(it) {
+    if (results[it.num].result !== 'yes') return;
+    results[it.num].findings.forEach(function(f, idx) {
+      var el = document.getElementById('duedate-f-'+it.num+'-'+idx);
+      if (el) el.textContent = computeDueDateLabel(f.ncLevel);
+    });
+  });
+}
+
+function togPill(findingId, itemNum, idx, el, pillText) {
+  if (!results[itemNum].findings[idx]) return;
+  var sel = el.classList.contains('sel-nc');
+  if (sel) {
+    el.classList.remove('sel-nc');
+    results[itemNum].findings[idx].pills = results[itemNum].findings[idx].pills.filter(function(p){ return p !== pillText; });
+  } else {
+    el.classList.add('sel-nc');
+    results[itemNum].findings[idx].pills.push(pillText);
+  }
+  autoFillDesc(itemNum, idx);
+}
+
+function autoFillDesc(itemNum, idx) {
+  if (!results[itemNum].findings[idx]) return;
+  var f    = results[itemNum].findings[idx];
+  var parts = [];
+  if (f.location) parts.push(f.location);
+  if (f.pills && f.pills.length > 0) parts.push(f.pills.join(', '));
+  if (f.note) parts.push(f.note);
+  var desc = parts.join(' — ');
+  results[itemNum].findings[idx].description = desc;
+  var el = document.getElementById('desc-f-'+itemNum+'-'+idx);
+  if (el) el.value = desc;
+}
+
+function toggleDefer(findingId, checked) {
+  var parts    = findingId.split('-');
+  var itemNum  = parseInt(parts[1]);
+  var idx      = parseInt(parts[2]);
+  if (results[itemNum].findings[idx]) results[itemNum].findings[idx].deferred = checked;
+  applyDeferredDisplay(findingId, checked);
+}
+
+function applyDeferredDisplay(findingId, checked) {
+  var body = document.getElementById('body-'+findingId);
+  var msg  = document.getElementById('deferred-msg-'+findingId);
+  if (body) {
+    body.querySelectorAll('.ca-row,.caf.full,.photo-area,.loc-row,.pills,.note-label,.note-field,.pills-label').forEach(function(el){
+      el.style.display = checked ? 'none' : '';
+    });
+  }
+  if (msg) msg.style.display = checked ? 'flex' : 'none';
+}
+
+// ── PHOTOS ────────────────────────────────────────────────────
+function addPhotos(itemNum, idx, input) {
+  if (!results[itemNum].findings[idx]) return;
+  var files = Array.from(input.files);
+  var findingId = 'f-'+itemNum+'-'+idx;
+  files.forEach(function(file) {
+    readPhotoAsDataUrl(file, function(name, dataUrl) {
+      results[itemNum].findings[idx].photos.push({name: name, dataUrl: dataUrl});
+      renderThumbs(itemNum, idx, findingId);
+    });
+  });
+  input.value = '';
+}
+
+// iPhones default to saving camera photos as HEIC, which most browsers
+// (and Google Docs' image embed) can't decode — convert to JPEG up front
+// so thumbnails, print views, and PDF reports all get a format that renders.
+function isHeicFile(file) {
+  var type = (file.type || '').toLowerCase();
+  var name = (file.name || '').toLowerCase();
+  return type === 'image/heic' || type === 'image/heif'
+    || name.endsWith('.heic') || name.endsWith('.heif');
+}
+
+function readPhotoAsDataUrl(file, onDone) {
+  if (!isHeicFile(file)) {
+    var reader = new FileReader();
+    reader.onload = function(e) { onDone(file.name, e.target.result); };
+    reader.readAsDataURL(file);
+    return;
+  }
+  heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
+    .then(function(converted) {
+      var jpegBlob = Array.isArray(converted) ? converted[0] : converted;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var newName = file.name.replace(/\.(heic|heif)$/i, '') + '.jpg';
+        onDone(newName, e.target.result);
+      };
+      reader.readAsDataURL(jpegBlob);
+    })
+    .catch(function(err) {
+      console.error('HEIC conversion failed', err);
+      alert('Could not convert "' + file.name + '" from HEIC format — try re-saving it as JPEG before uploading.');
+    });
+}
+
+function renderThumbs(itemNum, idx, findingId) {
+  var container = document.getElementById('thumbs-'+findingId);
+  if (!container || !results[itemNum].findings[idx]) return;
+  var html = '';
+  (results[itemNum].findings[idx].photos || []).forEach(function(p, i) {
+    html += '<div class="photo-thumb"><img src="'+p.dataUrl+'" alt="Photo '+(i+1)+'">'
+      + '<button class="photo-rm" onclick="removePhoto('+itemNum+','+idx+','+i+',\''+findingId+'\')">&times;</button></div>';
+  });
+  container.innerHTML = html;
+}
+
+function removePhoto(itemNum, idx, photoIdx, findingId) {
+  results[itemNum].findings[idx].photos.splice(photoIdx, 1);
+  renderThumbs(itemNum, idx, findingId);
+}
+
+// ── CAR ID REFRESH ────────────────────────────────────────────
+function refreshAllCarIds() {
+  var today  = new Date();
+  var ym     = today.getFullYear() + '' + String(today.getMonth()+1).padStart(2,'0');
+  var seq    = nextCarSeq;
+  ITEMS.forEach(function(it) {
+    if (results[it.num].result !== 'yes') return;
+    results[it.num].findings.forEach(function(f, idx) {
+      var el = document.getElementById('carid-f-'+it.num+'-'+idx);
+      if (el) el.textContent = 'CA-'+ym+'-'+String(seq).padStart(3,'0');
+      seq++;
+    });
+  });
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────
+function updateProgress() {
+  var checked = 0, nc = 0;
+  ITEMS.forEach(function(it) {
+    if (results[it.num].result) checked++;
+    if (results[it.num].result === 'yes') nc++;
+  });
+  var pct = Math.round((checked / 15) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('hChecked').textContent = checked + '/15';
+  document.getElementById('hNC').textContent = nc;
+}
+
+function updateCatScore(num) {
+  var it  = ITEMS.find(function(x){ return x.num === num; });
+  if (!it) return;
+  var cat      = it.cat;
+  var catItems = ITEMS.filter(function(x){ return x.cat === cat; });
+  var checked  = catItems.filter(function(x){ return results[x.num].result; }).length;
+  var nc       = catItems.filter(function(x){ return results[x.num].result === 'yes'; }).length;
+  document.getElementById('score-'+cat).textContent = checked + '/' + catItems.length;
+  var badge = document.getElementById('ncbadge-'+cat);
+  badge.textContent   = nc + ' NC';
+  badge.style.display = nc > 0 ? 'inline' : 'none';
+}
+
+function updateSummaryBar() {
+  // Count total findings (sum of all finding cards across all yes items)
+  var totalFindings = 0;
+  var deferred = 0;
+  ITEMS.forEach(function(it) {
+    if (results[it.num].result === 'yes') {
+      totalFindings += results[it.num].findings.length;
+      results[it.num].findings.forEach(function(f){ if (f.deferred) deferred++; });
+    }
+  });
+  var bar      = document.getElementById('ncSummaryBar');
+  var countEl  = document.getElementById('ncSumCount');
+  var subEl    = document.getElementById('ncSumSub');
+  countEl.textContent = totalFindings + ' finding' + (totalFindings !== 1 ? 's' : '');
+  if (totalFindings === 0) {
+    bar.className   = 'nc-summary-bar clean';
+    subEl.textContent = 'No findings — all checked items passing';
+  } else {
+    bar.className   = 'nc-summary-bar';
+    subEl.textContent = deferred > 0
+      ? deferred + ' CA' + (deferred !== 1 ? 's' : '') + ' deferred — complete details in tracker'
+      : 'All CA details captured';
+  }
+  // Category breakdown
+  var catsEl  = document.getElementById('ncSumCats');
+  var catHtml = '';
+  CATS.forEach(function(cat) {
+    var meta = CAT_META[cat];
+    var n    = ITEMS.filter(function(it){ return it.cat === cat && results[it.num].result === 'yes'; })
+                    .reduce(function(sum, it){ return sum + results[it.num].findings.length; }, 0);
+    if (n > 0) catHtml += '<span class="nc-cat-pill" style="background:'+meta.bg+';color:'+meta.fg+'">'+cat+': '+n+'</span>';
+  });
+  catsEl.innerHTML = catHtml;
+}
+
+// ── VALIDATE ──────────────────────────────────────────────────
+function validate() {
+  if (!document.getElementById('auditDate').value)          { showToast('Please enter the audit date', 'error'); return false; }
+  if (!document.getElementById('zoneSelect').value)         { showToast('Please select a zone', 'error'); return false; }
+  if (!document.getElementById('coordinator').value.trim()) { showToast('Please enter the audit coordinator', 'error'); return false; }
+  var anyChecked = ITEMS.some(function(it){ return results[it.num].result; });
+  if (!anyChecked) { showToast('Please check at least one inspection item', 'error'); return false; }
+  return true;
+}
+
+// ── BUILD PAYLOAD ─────────────────────────────────────────────
+function buildPayload() {
+  var today  = new Date();
+  var ym     = today.getFullYear() + '' + String(today.getMonth()+1).padStart(2,'0');
+  var seq    = nextCarSeq;
+
+  var auditInfo = {
+    auditDate:   document.getElementById('auditDate').value,
+    zone:        document.getElementById('zoneSelect').value,
+    coordinator: document.getElementById('coordinator').value.trim(),
+    designee:    document.getElementById('designee').value.trim(),
+  };
+
+  var counts = {maint:{y:0,n:0,na:0},sanit:{y:0,n:0,na:0},gmp:{y:0,n:0,na:0},safety:{y:0,n:0,na:0}};
+  var catKey = {'Maintenance':'maint','Sanitation':'sanit','GMP':'gmp','Safety':'safety'};
+  ITEMS.forEach(function(it) {
+    var r = results[it.num].result;
+    var k = catKey[it.cat];
+    if (r === 'yes') counts[k].y++;
+    else if (r === 'no')  counts[k].n++;
+    else if (r === 'na')  counts[k].na++;
+  });
+
+  var caRecords = [];
+  ITEMS.forEach(function(it) {
+    if (results[it.num].result !== 'yes') return;
+    results[it.num].findings.forEach(function(f) {
+      var carId = 'CA-' + ym + '-' + String(seq).padStart(3, '0');
+      seq++;
+      caRecords.push({
+        carId:             carId,
+        auditDate:         auditInfo.auditDate,
+        ncDate:            auditInfo.auditDate,
+        zone:              auditInfo.zone,
+        inspectionItem:    it.name,
+        locationInZone:    f.location,
+        ncLevel:           f.ncLevel || 'Minor',
+        description:       f.description,
+        responsiblePerson: f.responsiblePerson,
+        assignedBy:        f.assignedBy,
+        deferred:          f.deferred ? 'Yes' : 'No',
+        photos:            f.photos || [],
+      });
+    });
+  });
+
+  return { auditInfo: auditInfo, counts: counts, caRecords: caRecords };
+}
+
+// ── REVIEW BEFORE SUBMIT ────────────────────────────────────────
+var ZONE_NAMES_FULL = {
+  '1':'Zone 1 – Shipping & Receiving','2':'Zone 2 – Metals','3':'Zone 3 – Plastics',
+  '4':'Zone 4 – Lithography','5':'Zone 5 – Miscellaneous'
+};
+
+function submitAudit() {
+  if (submitting) return;
+  if (!validate()) return;
+  document.getElementById('reviewBody').innerHTML = buildReviewHTML(buildPayload());
+  document.getElementById('reviewOverlay').classList.add('show');
+}
+
+function closeReviewOverlay() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+}
+
+function buildReviewHTML(payload) {
+  var ai = payload.auditInfo;
+  var html = '';
+
+  html += '<div class="rv-sec"><div class="rv-sec-title">Audit information</div>';
+  html += '<div class="rv-row"><span class="rv-lbl">Audit date</span><span class="rv-val">'+esc(ai.auditDate)+'</span></div>';
+  html += '<div class="rv-row"><span class="rv-lbl">Zone</span><span class="rv-val">'+esc(ZONE_NAMES_FULL[ai.zone]||('Zone '+ai.zone))+'</span></div>';
+  html += '<div class="rv-row"><span class="rv-lbl">Coordinator</span><span class="rv-val">'+esc(ai.coordinator||'—')+'</span></div>';
+  html += '<div class="rv-row"><span class="rv-lbl">Zone auditor/designee</span><span class="rv-val">'+esc(ai.designee||'—')+'</span></div>';
+  html += '</div>';
+
+  html += '<div class="rv-sec"><div class="rv-sec-title">Checklist summary</div>';
+  var catNames = {maint:'Maintenance', sanit:'Sanitation', gmp:'GMP', safety:'Safety'};
+  Object.keys(payload.counts).forEach(function(k) {
+    var c = payload.counts[k];
+    html += '<div class="rv-row"><span class="rv-lbl">'+catNames[k]+'</span><span class="rv-val">'+c.y+' NC &middot; '+c.n+' pass &middot; '+c.na+' N/A</span></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="rv-sec"><div class="rv-sec-title">CA findings ('+payload.caRecords.length+')</div>';
+  if (!payload.caRecords.length) {
+    html += '<div class="rv-empty">No nonconformances found — nothing to review here.</div>';
+  } else {
+    payload.caRecords.forEach(function(car, i) {
+      html += '<div class="rv-finding">'
+        + '<div class="rv-finding-hdr"><span class="rv-finding-item">'+(i+1)+'. '+esc(car.inspectionItem)+'</span><span style="font-size:9px;font-weight:bold;color:var(--amber)">'+esc(car.ncLevel)+'</span></div>'
+        + '<div class="rv-finding-detail">'
+        + (car.locationInZone ? esc(car.locationInZone)+'<br>' : '')
+        + (car.description ? esc(car.description)+'<br>' : '')
+        + (car.responsiblePerson ? 'Responsible: '+esc(car.responsiblePerson)+' ' : '')
+        + (car.assignedBy ? '&middot; Assigned by: '+esc(car.assignedBy) : '')
+        + (car.photos && car.photos.length ? '<br>📷 '+car.photos.length+' photo'+(car.photos.length!==1?'s':'') : '')
+        + (car.deferred === 'Yes' ? '<br><span style="color:var(--amber)">⏱ Details deferred</span>' : '')
+        + '</div></div>';
+    });
+  }
+  html += '</div>';
+
+  return html;
+}
+
+// ── SUBMIT (fires only after the review overlay is confirmed) ──
+function confirmSubmit() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+  if (submitting) return;
+  submitting = true;
+  document.getElementById('btnSubmit').disabled = true;
+  showOverlay('Submitting audit and creating CA records…');
+
+  var payload = buildPayload();
+  google.script.run
+    .withSuccessHandler(function(result) {
+      hideOverlay();
+      submitting = false;
+      if (result && result.success) {
+        showSchedulePrompt(result, payload.auditInfo);
+      } else {
+        document.getElementById('btnSubmit').disabled = false;
+        showToast('Error: ' + (result && result.message ? result.message : 'Unknown error'), 'error');
+      }
+    })
+    .withFailureHandler(function(e) {
+      hideOverlay();
+      submitting = false;
+      document.getElementById('btnSubmit').disabled = false;
+      showToast('Submit failed: ' + (e && e.message ? e.message : String(e)), 'error');
+    })
+    .submitAuditForm(payload);
+}
+
+// ── POST-SUBMIT: OFFER TO SCHEDULE THE NEXT AUDIT ──────────────
+var lastAuditInfo = null;
+
+function showSchedulePrompt(result, auditInfo) {
+  lastAuditInfo = auditInfo;
+  document.getElementById('scheduleSubMsg').textContent =
+    result.caCount + ' CA record' + (result.caCount !== 1 ? 's' : '') + ' created.';
+  document.getElementById('scheduleAskBlock').style.display = 'block';
+  document.getElementById('scheduleFieldsBlock').style.display = 'none';
+  document.getElementById('scheduleFieldsBlock').style.opacity = '1';
+  document.getElementById('scheduleOverlay').classList.add('show');
+}
+
+function closeScheduleOverlay() {
+  document.getElementById('scheduleOverlay').classList.remove('show');
+  google.script.host.close();
+}
+
+// Next audit = 30 days out, bumped forward to the next weekday if that
+// lands on a Saturday/Sunday. Still fully editable before confirming.
+function computeNextAuditDate(auditDateStr) {
+  var parts = auditDateStr.split('-');
+  var d = new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+  d.setDate(d.getDate() + 30);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function showScheduleDateField() {
+  document.getElementById('scheduleAskBlock').style.display = 'none';
+  document.getElementById('scheduleFieldsBlock').style.display = 'block';
+  document.getElementById('nextAuditDate').value = computeNextAuditDate(lastAuditInfo.auditDate);
+}
+
+function confirmScheduleNext() {
+  var date = document.getElementById('nextAuditDate').value;
+  if (!date) { showToast('Please pick a date', 'error'); return; }
+  document.getElementById('scheduleFieldsBlock').style.opacity = '0.5';
+  google.script.run
+    .withSuccessHandler(function(r) {
+      if (r && r.success) {
+        document.getElementById('scheduleSubMsg').textContent = 'Next audit scheduled for ' + date + '. Confirmation email sent.';
+        document.getElementById('scheduleAskBlock').style.display = 'none';
+        document.getElementById('scheduleFieldsBlock').style.display = 'none';
+        setTimeout(function(){ google.script.host.close(); }, 2200);
+      } else {
+        document.getElementById('scheduleFieldsBlock').style.opacity = '1';
+        showToast('Could not schedule: ' + (r && r.message ? r.message : 'Unknown error'), 'error');
+      }
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('scheduleFieldsBlock').style.opacity = '1';
+      showToast('Could not schedule: ' + (e && e.message ? e.message : String(e)), 'error');
+    })
+    .scheduleAudit(lastAuditInfo.zone, date, '');
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(function(){ el.classList.remove('show'); }, 3500);
+}
+function showOverlay(msg) { document.getElementById('spinMsg').textContent = msg || 'Processing…'; document.getElementById('overlay').classList.add('show'); }
+function hideOverlay()    { document.getElementById('overlay').classList.remove('show'); }
+function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+</script>
