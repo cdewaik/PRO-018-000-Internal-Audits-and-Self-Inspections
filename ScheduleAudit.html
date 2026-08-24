@@ -1,0 +1,257 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#F0F2F7;color:#1E3A52;font-size:13px;padding:20px}
+
+.card{background:#fff;border:0.5px solid #D0D7E8;padding:0;overflow:hidden}
+.card-head{background:#1E3A52;padding:12px 16px}
+.card-head h2{font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px}
+.card-head p{font-size:9px;color:#B5D4F4;text-transform:uppercase;letter-spacing:.04em}
+.card-body{padding:16px}
+
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:9px;font-weight:bold;color:#4A7FA5;text-transform:uppercase;letter-spacing:.04em}
+.field select,.field input{
+  height:36px;font-size:12px;border:0.5px solid #D0D7E8;border-radius:0;
+  padding:0 10px;background:#F7F9FB;color:#1E3A52;width:100%;font-family:Arial}
+.field select:focus,.field input:focus{outline:none;border-color:#2D5F82;background:#fff}
+
+.reminder-note{font-size:10px;color:#6B7280;background:#E8EEF4;padding:8px 10px;
+  margin-bottom:14px;border-left:3px solid #2D5F82;line-height:1.5}
+
+.btn-row{display:flex;gap:8px;margin-top:4px}
+.btn-primary{flex:1;height:40px;background:#1E3A52;color:#fff;border:none;border-radius:0;
+  font-size:13px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-primary:hover{background:#2D5F82}
+.btn-primary:disabled{background:#888;cursor:not-allowed}
+.btn-secondary{height:40px;padding:0 16px;background:#F7F9FB;border:0.5px solid #D0D7E8;
+  border-radius:0;font-size:12px;color:#6B7280;cursor:pointer;font-family:Arial}
+.btn-secondary:hover{background:#E8EEF4}
+
+/* PREVIEW PANEL */
+.preview-panel{display:none;margin-top:14px;border:1px solid #D0D7E8;overflow:hidden}
+.preview-head{background:#E8EEF4;padding:8px 12px;border-bottom:0.5px solid #D0D7E8;
+  font-size:10px;font-weight:bold;color:#2D5F82;text-transform:uppercase;letter-spacing:.05em}
+.preview-body{padding:12px}
+.preview-row{display:flex;gap:8px;margin-bottom:7px;font-size:11px;align-items:flex-start}
+.preview-row:last-child{margin-bottom:0}
+.pl{color:#888;width:110px;flex-shrink:0;font-size:10px;padding-top:1px}
+.pv{color:#1E3A52;font-weight:bold;flex:1}
+.pv.email{color:#2D5F82;font-weight:normal;font-style:italic}
+.pv.warn{color:#B71C1C}
+.preview-divider{height:0.5px;background:#D0D7E8;margin:8px 0}
+
+.msg{padding:10px 12px;margin-top:10px;font-size:11px;font-weight:bold;
+  text-align:center;display:none;border-radius:0}
+.msg.ok{background:#D6EFD8;color:#1A6B1A;border:0.5px solid #86EFAC}
+.msg.err{background:#FAD7D7;color:#B71C1C;border:0.5px solid #FECACA}
+.msg.info{background:#E8EEF4;color:#2D5F82;border:0.5px solid #B8CDD9}
+
+.spinner-wrap{text-align:center;padding:14px;display:none}
+.spinner-txt{font-size:11px;color:#888;font-style:italic}
+</style>
+
+<div class="card">
+  <div class="card-head">
+    <h2>Schedule Next Audit</h2>
+    <p>FRM-018-002 &nbsp;·&nbsp; Facility Self Inspection</p>
+  </div>
+  <div class="card-body">
+
+    <!-- STEP 1: FORM -->
+    <div id="step1">
+      <div class="field">
+        <label>Zone</label>
+        <select id="zone">
+          <option value="">Select zone…</option>
+          <option value="1">Zone 1 – Shipping &amp; Receiving</option>
+          <option value="2">Zone 2 – Metals</option>
+          <option value="3">Zone 3 – Plastics</option>
+          <option value="4">Zone 4 – Lithography</option>
+          <option value="5">Zone 5 – Miscellaneous</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Scheduled audit date</label>
+        <input type="date" id="schedDate">
+      </div>
+
+      <div class="field">
+        <label>Audit coordinator email</label>
+        <input type="email" id="coordEmail" placeholder="izuniga@cscmfg.com">
+      </div>
+
+      <div class="reminder-note">
+        A confirmation email is sent immediately, then a reminder email 3 days before the scheduled date.
+        Make sure the manager email is set in the Settings tab Zone Managers table.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="google.script.host.close()">Cancel</button>
+        <button class="btn-primary" onclick="showPreview()">Preview &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: PREVIEW + CONFIRM -->
+    <div id="step2" style="display:none">
+      <div class="preview-panel" id="previewPanel" style="display:block">
+        <div class="preview-head">Confirm — review before scheduling</div>
+        <div class="preview-body">
+          <div class="preview-row"><span class="pl">Zone</span><span class="pv" id="pv_zone"></span></div>
+          <div class="preview-row"><span class="pl">Audit date</span><span class="pv" id="pv_date"></span></div>
+          <div class="preview-row"><span class="pl">Coordinator</span><span class="pv" id="pv_coord"></span></div>
+          <div class="preview-divider"></div>
+          <div class="preview-row"><span class="pl">Reminder to</span><span class="pv email" id="pv_email"></span></div>
+          <div class="preview-row"><span class="pl">Reminder sent</span><span class="pv" id="pv_when"></span></div>
+          <div class="preview-row" id="pv_warn_row" style="display:none">
+            <span class="pl"></span><span class="pv warn" id="pv_warn"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="spinner-wrap" id="spinWrap">
+        <div class="spinner-txt">Scheduling and sending confirmation...</div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px" id="step2Btns">
+        <button class="btn-secondary" onclick="goBack()">&#8592; Back</button>
+        <button class="btn-primary" id="btnConfirm" onclick="doSchedule()">
+          Confirm &amp; Schedule &rarr;
+        </button>
+      </div>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+  </div>
+</div>
+
+<script>
+var ZONE_NAMES = {
+  '1':'Zone 1 – Shipping & Receiving',
+  '2':'Zone 2 – Metals',
+  '3':'Zone 3 – Plastics',
+  '4':'Zone 4 – Lithography',
+  '5':'Zone 5 – Miscellaneous'
+};
+
+// Set default date to 30 days from now
+var d = new Date();
+d.setDate(d.getDate() + 30);
+document.getElementById('schedDate').value = d.toISOString().split('T')[0];
+
+function showPreview() {
+  var zone  = document.getElementById('zone').value;
+  var sdate = document.getElementById('schedDate').value;
+  var email = document.getElementById('coordEmail').value.trim();
+
+  if (!zone)  { showMsg('Please select a zone.', 'err'); return; }
+  if (!sdate) { showMsg('Please select a scheduled date.', 'err'); return; }
+
+  clearMsg();
+
+  // Format the date nicely
+  var parts    = sdate.split('-');
+  var dateObj  = new Date(parts[0], parts[1]-1, parts[2]);
+  var fmtDate  = dateObj.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  // Calculate reminder date (3 days before)
+  var reminderDate = new Date(dateObj.getTime());
+  reminderDate.setDate(reminderDate.getDate() - 3);
+  var fmtReminder  = reminderDate.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+  // Check if reminder date is in the past
+  var today     = new Date(); today.setHours(0,0,0,0);
+  var isPast    = reminderDate < today;
+  var isSameDay = Math.abs(dateObj - today) < 86400000 * 4; // within 3 days
+
+  document.getElementById('pv_zone').textContent  = ZONE_NAMES[zone] || 'Zone ' + zone;
+  document.getElementById('pv_date').textContent  = fmtDate;
+  document.getElementById('pv_coord').textContent = email || '(not provided)';
+
+  // Load zone manager email from server for preview
+  google.script.run
+    .withSuccessHandler(function(mgrs) {
+      var mgr   = (mgrs || {})[zone] || {};
+      var mEmail = mgr.email || '';
+      var mName  = mgr.name  || '';
+
+      document.getElementById('pv_email').textContent =
+        mName ? mName + ' <' + (mEmail||'not set') + '>' : (mEmail || '⚠ Not set in Settings tab');
+
+      if (isPast || isSameDay) {
+        document.getElementById('pv_when').textContent = 'Immediately (audit is within 3 days)';
+      } else {
+        document.getElementById('pv_when').textContent = fmtReminder + ' (3 days before)';
+      }
+
+      var warnRow = document.getElementById('pv_warn_row');
+      var warn    = document.getElementById('pv_warn');
+      if (!mEmail || mEmail.indexOf('@') === -1) {
+        warnRow.style.display = 'flex';
+        warn.textContent = '⚠ No email on file for this zone. Update the Settings tab before confirming.';
+        document.getElementById('btnConfirm').disabled = true;
+      } else {
+        warnRow.style.display = 'none';
+        document.getElementById('btnConfirm').disabled = false;
+      }
+    })
+    .withFailureHandler(function() {
+      document.getElementById('pv_email').textContent = '(could not load — check Settings tab)';
+    })
+    .getZoneManagers();
+
+  document.getElementById('pv_when').textContent = 'Loading...';
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+}
+
+function goBack() {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  clearMsg();
+}
+
+function doSchedule() {
+  var zone  = document.getElementById('zone').value;
+  var sdate = document.getElementById('schedDate').value;
+  var email = document.getElementById('coordEmail').value.trim();
+
+  document.getElementById('btnConfirm').disabled = true;
+  document.getElementById('step2Btns').style.display = 'none';
+  document.getElementById('spinWrap').style.display = 'block';
+
+  google.script.run
+    .withSuccessHandler(function(r) {
+      document.getElementById('spinWrap').style.display = 'none';
+      if (r && r.success) {
+        document.getElementById('previewPanel').style.display = 'none';
+        showMsg('✅ Scheduled! ID: ' + r.schedId + '. Confirmation email sent to zone manager.', 'ok');
+        setTimeout(function(){ google.script.host.close(); }, 2800);
+      } else {
+        document.getElementById('step2Btns').style.display = 'flex';
+        document.getElementById('btnConfirm').disabled = false;
+        showMsg('Error: ' + (r && r.message ? r.message : 'Unknown error'), 'err');
+      }
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('spinWrap').style.display = 'none';
+      document.getElementById('step2Btns').style.display = 'flex';
+      document.getElementById('btnConfirm').disabled = false;
+      showMsg('Error: ' + (e && e.message ? e.message : String(e)), 'err');
+    })
+    .scheduleAudit(zone, sdate, email);
+}
+
+function showMsg(txt, type) {
+  var el = document.getElementById('msg');
+  el.textContent  = txt;
+  el.className    = 'msg ' + type;
+  el.style.display = 'block';
+}
+function clearMsg() {
+  var el = document.getElementById('msg');
+  el.style.display = 'none';
+  el.textContent   = '';
+}
+</script>
