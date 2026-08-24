@@ -1,0 +1,1225 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F2D5C;--steel:#2D5F82;--steel-l:#4A7FA5;--steel-bg:#E8EEF4;--steel-md:#B8CDD9;
+  --dark:#1E3A52;--muted:#6B7280;--border:#D0D7E8;--slate:#F7F9FB;
+  --red:#991B1B;--red-bg:#FEF2F2;--red-bd:#FECACA;
+  --green:#166534;--green-bg:#F0FDF4;--green-bd:#86EFAC;
+  --amber:#92400E;--amber-bg:#FFFBEB;--amber-bd:#FCD34D;
+  --gold:#E8B000;
+}
+html,body{font-family:Arial,sans-serif;font-size:12px;color:var(--dark);background:#EEF1F6;margin:0;padding:0;height:100%;overflow:hidden}
+
+/* ── SCREEN LAYOUT ── */
+.layout{display:flex;height:100vh;overflow:hidden}
+
+/* ── LEFT PANEL ── */
+.left{width:280px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;overflow:hidden}
+.lh{padding:12px 12px 10px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
+.lh-title{font-size:13px;font-weight:bold;color:#fff}
+.lh-sub{font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.filter-block{padding:10px 10px 8px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
+.filter-lbl{font-size:9px;font-weight:bold;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.filter-select{width:100%;padding:5px 8px;border:0.5px solid rgba(255,255,255,.2);border-radius:0;font-size:10px;background:rgba(255,255,255,.08);color:#fff;font-family:Arial;margin-bottom:5px}
+.filter-select option{background:var(--navy);color:#fff}
+.btn-search{width:100%;padding:6px;background:var(--gold);color:#1A1400;border:none;border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-search:hover{background:#FFD000}
+.results-area{flex:1;overflow-y:auto;padding:5px 6px;min-height:0}
+.results-area::-webkit-scrollbar{width:4px}
+.results-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+.section-hdr{font-size:9px;font-weight:bold;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;padding:6px 3px 4px;display:flex;align-items:center;justify-content:space-between}
+.section-ct{font-size:9px;background:rgba(255,255,255,.1);color:#B5D4F4;padding:1px 6px;border-radius:8px}
+.section-div{height:0.5px;background:rgba(255,255,255,.1);margin:4px 0 6px}
+.list-empty{padding:16px 6px;text-align:center;color:rgba(255,255,255,.3);font-size:10px;font-style:italic;line-height:1.6}
+.rc{background:rgba(255,255,255,.07);padding:7px 8px;margin-bottom:3px;cursor:pointer;border-left:2px solid transparent;transition:background .1s}
+.rc:hover{background:rgba(255,255,255,.13)}
+.rc.active{background:rgba(255,255,255,.17);border-left-color:var(--gold)}
+.rc-id{font-family:monospace;font-size:10px;font-weight:bold;color:var(--gold);margin-bottom:2px}
+.rc-item{font-size:10px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+.rc-loc{font-size:9px;color:rgba(255,255,255,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.rc-meta{display:flex;justify-content:space-between;align-items:center}
+.lv-pill{font-size:8px;font-weight:bold;padding:1px 5px}
+.lv-c{background:#FEF2F2;color:#7F1D1D}.lv-m{background:#FFFBEB;color:#78350F}
+.lv-n{background:#EFF6FF;color:#1E3A8A}.lv-o{background:#F3F4F6;color:#4B5563}
+.st-pill{font-size:8px;font-weight:bold;padding:1px 5px}
+.st-op{background:#FFFBEB;color:#92400E}
+.st-pd{background:#FEF2F2;color:#991B1B}
+.st-cp{background:#F0FDF4;color:#166534}
+.st-rm{background:#F3F4F6;color:#4B5563}
+.st-cl{background:#DCEEFB;color:#1B4F72}
+
+/* ── SEND PANEL / MULTI-SELECT ── */
+.rc-row{display:flex;align-items:flex-start;gap:8px}
+.rc-check{width:15px;height:15px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer}
+.rc-body{flex:1;min-width:0}
+.send-panel{padding:10px;border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;background:rgba(0,0,0,.15)}
+.sel-count{font-size:10px;color:#B5D4F4;margin-bottom:8px;font-weight:bold}
+.btn-send{width:100%;padding:9px;background:var(--gold);color:#1A1400;border:none;border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;font-family:Arial;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-send:hover{background:#FFD000}
+.btn-send:disabled{background:#555;color:#888;cursor:not-allowed}
+.btn-select-all{width:100%;padding:5px;background:rgba(255,255,255,.08);color:#B5D4F4;border:0.5px solid rgba(255,255,255,.15);border-radius:0;font-size:10px;cursor:pointer;font-family:Arial;margin-bottom:6px;text-align:left}
+.btn-select-all:hover{background:rgba(255,255,255,.15)}
+.btn-print-sel{width:100%;padding:8px;margin-top:6px;background:var(--steel);color:#fff;border:none;border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;font-family:Arial;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-print-sel:hover{background:var(--steel-l)}
+.btn-print-sel:disabled{background:#555;color:#888;cursor:not-allowed}
+
+/* ── SEND PREVIEW OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.ov-box{background:#fff;width:580px;max-height:82vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.pv-hdr{background:var(--dark);padding:10px 14px}
+.pv-hdr-title{font-size:12px;font-weight:bold;color:#fff}
+.pv-hdr-sub{font-size:9px;color:#B5D4F4;margin-top:1px}
+.pv-body{padding:14px}
+.pv-sec{margin-bottom:14px}
+.pv-sec-title{font-size:9px;font-weight:bold;color:var(--steel);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;padding-bottom:4px;border-bottom:0.5px solid var(--border)}
+.pv-row{display:flex;gap:8px;margin-bottom:5px;font-size:11px;align-items:flex-start}
+.pv-lbl{color:var(--muted);width:100px;flex-shrink:0;font-size:10px;padding-top:1px}
+.pv-val{color:var(--dark);font-weight:500;flex:1}
+.pv-val.em{color:var(--steel);font-style:italic;font-weight:normal}
+.pv-warn{background:#FFFBEB;border:0.5px solid #FCD34D;padding:8px 10px;font-size:10px;color:#92400E;margin-bottom:10px}
+.pv-recs{display:flex;flex-direction:column;gap:3px;max-height:220px;overflow-y:auto}
+.pv-rec{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--slate);border:.5px solid var(--border);font-size:10px}
+.pv-rec-id{font-family:monospace;font-weight:bold;color:var(--steel);width:140px;flex-shrink:0}
+.pv-rec-item{flex:1;color:var(--dark)}
+.pv-rec-lv{font-size:8px;font-weight:bold;padding:1px 5px}
+.pv-footer{padding:10px 14px;border-top:.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--slate)}
+.btn-confirm{padding:8px 20px;background:var(--dark);color:#fff;border:none;border-radius:0;font-size:12px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-confirm:hover{background:var(--steel)}
+.btn-confirm:disabled{background:#888;cursor:not-allowed}
+.btn-cancel-pv{padding:8px 14px;background:#fff;color:var(--muted);border:.5px solid var(--border);border-radius:0;font-size:12px;cursor:pointer;font-family:Arial}
+
+/* ── RIGHT PANEL ── */
+.right{flex:1;overflow-y:auto;background:#EEF1F6;display:flex;flex-direction:column}
+.right-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);text-align:center;gap:10px;padding:40px}
+.empty-icon{font-size:40px;opacity:.2}
+.empty-txt{font-size:12px;font-style:italic;color:#9CA3AF;line-height:1.6}
+
+/* ── FORM HEADER (screen only) ── */
+.form-header{background:var(--navy);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.fh-left h2{font-size:14px;font-weight:bold;color:#fff}
+.fh-left p{font-size:9px;color:#7BA8C4;margin-top:1px}
+.fh-right{display:flex;gap:6px}
+.btn-print{padding:8px 16px;background:var(--steel);color:#fff;border:none;border-radius:0;font-size:12px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-print:hover{background:var(--steel-l)}
+.btn-save{padding:8px 20px;background:var(--gold);color:#1A1400;border:none;border-radius:0;font-size:12px;font-weight:bold;cursor:pointer;font-family:Arial}
+.btn-save:hover{background:#FFD000}
+.btn-save:disabled{background:#555;color:#888;cursor:not-allowed}
+.btn-clear-rpt{padding:8px 12px;background:rgba(255,255,255,.1);color:#fff;border:0.5px solid rgba(255,255,255,.2);border-radius:0;font-size:12px;cursor:pointer;font-family:Arial}
+
+/* ── SHARED SECTION STYLES ── */
+.sh{padding:5px 14px;font-size:9px;font-weight:bold;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:var(--steel-l)}
+.sh2{background:var(--steel)}.sh3{background:var(--dark)}.sh4{background:#111E2E}
+.info-card,.edit-card{background:#fff;border:0.5px solid var(--border);padding:12px 14px;margin-bottom:2px}
+.info-grid{display:grid;gap:10px;margin-bottom:8px}
+.info-grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.info-grid-2{grid-template-columns:1fr 1fr}
+.info-field{display:flex;flex-direction:column;gap:2px}
+.info-field.full{grid-column:1/-1}
+.il{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:bold}
+.iv{font-size:11px;color:var(--dark);padding:4px 0;border-bottom:0.5px solid var(--border);min-height:20px}
+.iv.mono{font-family:monospace;font-weight:bold;color:var(--steel)}
+.iv.long{min-height:44px;line-height:1.6;white-space:pre-wrap}
+.iv.blank{min-height:50px}
+.nc-pill{display:inline-block;padding:2px 8px;font-size:10px;font-weight:bold;border:0.5px solid}
+.nc-c{background:#FEF2F2;color:#7F1D1D;border-color:#FECACA}
+.nc-m{background:#FFFBEB;color:#78350F;border-color:#FCD34D}
+.nc-n{background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE}
+.nc-o{background:#F3F4F6;color:#4B5563;border-color:#D1D5DB}
+
+/* EDITABLE FIELDS */
+.field-grid{display:grid;gap:10px}
+.field-grid-2{grid-template-columns:1fr 1fr}
+.field-grid-3{grid-template-columns:1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:3px}
+.field.full{grid-column:1/-1}
+.field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:bold}
+.field label .req{color:var(--red);font-size:8px}
+.field input,.field select,.field textarea{border:0.5px solid var(--border);border-radius:0;padding:7px 10px;font-size:12px;font-family:Arial;background:var(--slate);color:var(--dark);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--steel);background:#fff}
+.field textarea{height:90px;resize:vertical}
+
+/* STATUS PILLS */
+.status-pills{display:flex;gap:6px;flex-wrap:wrap}
+.sp{height:34px;padding:0 14px;border:0.5px solid var(--border);border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;font-family:Arial;background:var(--slate);color:var(--muted);transition:all .1s}
+.sp:hover{border-color:var(--steel)}
+.sp.sel-cp{background:#F0FDF4;border-color:#86EFAC;color:#166534;border-width:2px}
+.sp.sel-op{background:#FFFBEB;border-color:#FCD34D;color:#92400E;border-width:2px}
+.sp.sel-pd{background:#FEF2F2;border-color:#FECACA;color:#991B1B;border-width:2px}
+.sp.sel-rm{background:#F3F4F6;border-color:#9CA3AF;color:#4B5563;border-width:2px}
+
+/* PHOTOS */
+.photo-area{margin-top:10px}
+.photo-btn-label{width:100%;height:40px;border:1.5px dashed var(--border);background:var(--slate);color:var(--steel);font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:Arial}
+.photo-btn-label:hover{background:var(--steel-bg)}
+.photo-btn-label input[type=file]{display:none}
+.photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.photo-thumb{position:relative;width:220px;height:220px}
+.photo-thumb img{width:220px;height:220px;object-fit:cover;border:0.5px solid var(--border)}
+.photo-rm{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--red);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.existing-photos{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.existing-photo{display:flex;flex-direction:column;align-items:center;gap:3px}
+.existing-photo img{width:220px;height:220px;object-fit:cover;border:0.5px solid var(--border)}
+.existing-photo-lbl{font-size:8px;color:var(--muted);text-align:center;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-loading{font-size:10px;color:var(--muted);font-style:italic;padding:6px 0}
+
+/* COMPLETION GRID */
+.cl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border:0.5px solid var(--border);background:#fff}
+.cl-cell{padding:8px 12px;border-right:.5px solid var(--border)}
+.cl-cell:last-child{border-right:none}
+.cl-lbl{font-size:8.5px;color:#9CA3AF;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.cl-val{font-size:11px;color:var(--dark);font-weight:bold;min-height:16px}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;font-size:12px;font-weight:bold;z-index:999;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.toast.show{display:block}
+.toast.ok{background:#166534}
+.toast.err{background:#991B1B}
+
+/* ── PRINT STYLES ── */
+@media print {
+  /* Hide everything except the report */
+  .layout{display:block}
+  .left{display:none!important}
+  .right{overflow:visible;background:#fff}
+  .form-header{display:none!important}
+  .edit-card .field,.edit-card .field-grid,.status-pills,.photo-btn-label,.photo-rm{display:none!important}
+  html,body{overflow:visible;height:auto;background:#fff}
+  .toast{display:none!important}
+
+  /* Report styles for print */
+  .print-report{display:block!important}
+  .rpt-header{display:grid!important}
+  .sh,.sh2,.sh3,.sh4{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .info-card{border:0.5px solid #D0D7E8;page-break-inside:avoid}
+  /* Editable-field cards only ever show their print-only child block on
+     print (the .info-card/.cl-grid nested inside) — the edit-card itself
+     should collapse to an invisible wrapper so it doesn't draw a second,
+     mismatched border/gap around that child, unlike Section 1's plain card. */
+  .edit-card{border:none;background:none;padding:0;page-break-inside:avoid}
+
+  /* Make print section visible */
+  #printSection{display:block!important}
+  #screenControls{display:none!important}
+  .right-empty{display:none!important}
+
+  /* Batch print (multiple selected records) swaps in for the single-record view.
+     .layout still carries its on-screen height:100vh even in print, and
+     #batchPrintSection lives outside it — left uncollapsed, that reserved
+     full-page height printed as a blank leading page before the real content. */
+  body.batch-printing .layout{display:none!important}
+  body.batch-printing #printSection{display:none!important}
+  body.batch-printing #batchPrintSection{display:block!important}
+}
+</style>
+
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-box">
+    <div class="pv-hdr"><div class="pv-hdr-title">Send notification — CA reports</div><div class="pv-hdr-sub">Review before sending. PDFs generated with photos embedded and saved to Drive.</div></div>
+    <div class="pv-body" id="pvBody"><div style="padding:20px;text-align:center;color:#888;font-style:italic">Loading...</div></div>
+    <div class="pv-footer" id="pvFooter">
+      <button class="btn-cancel-pv" onclick="closeOverlay()">Cancel</button>
+      <button class="btn-confirm" id="btnConfirm" onclick="confirmSend()">Send email →</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+
+<div class="layout">
+
+  <!-- LEFT PANEL (screen only) -->
+  <div class="left" id="screenControls">
+    <div class="lh">
+      <div class="lh-title">Update CA Record</div>
+      <div class="lh-sub">FRM-018-004 &nbsp;·&nbsp; CSC</div>
+    </div>
+    <div class="filter-block">
+      <div class="filter-lbl">Filter</div>
+      <select class="filter-select" id="s_zone" onchange="onZoneFilterChange()">
+        <option value="">All zones</option>
+        <option value="1">Zone 1 — Shipping &amp; Receiving</option>
+        <option value="2">Zone 2 — Metals</option>
+        <option value="3">Zone 3 — Plastics</option>
+        <option value="4">Zone 4 — Lithography</option>
+        <option value="5">Zone 5 — Miscellaneous</option>
+      </select>
+      <select class="filter-select" id="s_month">
+        <option value="">All months</option>
+      </select>
+      <select class="filter-select" id="s_status">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="pastdue">Past due</option>
+        <option value="complete">Complete</option>
+      </select>
+      <button class="btn-search" onclick="doSearch()">Search</button>
+    </div>
+    <div class="results-area" id="resList">
+      <div class="list-empty">Select a zone and status then click Search.</div>
+    </div>
+    <div class="send-panel">
+      <button class="btn-select-all" id="btnSelectAll" onclick="toggleSelectAll()">☐ Select all open</button>
+      <div class="sel-count" id="selCount">Select a zone to send notifications</div>
+      <button class="btn-send" id="btnSend" onclick="openPreview()" disabled>✉ Send notification →</button>
+      <button class="btn-print-sel" id="btnPrintSel" onclick="printSelectedRecords()" disabled>🖨 Print / Save selected →</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right" id="rightPanel">
+    <div class="right-empty">
+      <div class="empty-icon">📝</div>
+      <div class="empty-txt">Select a CA record on the left<br>to view, add photos, or update it here.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Hidden container used only when printing multiple selected records at once -->
+<div id="batchPrintSection" style="display:none"></div>
+
+<!-- Off-screen (but laid out — html2canvas can't rasterize display:none) render
+     target used to build the emailed/Drive-saved PDF from the same styled
+     report markup as the on-screen Print/Save view. -->
+<div id="pdfRenderSection" style="position:fixed;top:0;left:-99999px;width:816px;background:#fff"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+var allRecords   = [];
+var selectedRec  = null;
+var selectedStatus = 'Open';
+var newPhotos    = [];
+var existingPhotoData = [];
+var filtered     = [];
+var selectedIds  = [];
+var allSelected  = false;
+var previewData  = null;
+
+var ZONE_NAMES = {'1':'Shipping & Receiving','2':'Metals','3':'Plastics','4':'Lithography','5':'Miscellaneous'};
+
+window.onload = function() { doSearch(); };
+
+// Rebuilds the month dropdown from whatever months actually appear in the
+// fetched CA Log records, instead of a fixed rolling window — keeps out
+// month options with zero records. Preserves the current selection if it's
+// still present after the rebuild.
+function populateMonthsFromRecords(records) {
+  var sel = document.getElementById('s_month');
+  var current = sel.value;
+  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var seen = {};
+  var months = [];
+  (records || []).forEach(function(r) {
+    var ym = auditYearMonth(r);
+    if (ym && !seen[ym]) { seen[ym] = true; months.push(ym); }
+  });
+  months.sort(function(a,b){ return b.localeCompare(a); });
+  var html = '<option value="">All months</option>';
+  months.forEach(function(ym) {
+    var year = ym.slice(0,4), mIdx = parseInt(ym.slice(4,6),10) - 1;
+    html += '<option value="'+ym+'">'+M[mIdx]+' '+year+' Audit</option>';
+  });
+  sel.innerHTML = html;
+  if (months.indexOf(current) !== -1) sel.value = current;
+}
+
+// Audit date comes back as a MM/dd/yyyy display string — convert to YYYYMM for comparison.
+function auditYearMonth(r) {
+  var parts = String(r.auditDate || '').split('/');
+  if (parts.length !== 3) return '';
+  return parts[2] + parts[0].padStart(2,'0');
+}
+
+// ── SEARCH ────────────────────────────────────────────────────
+function doSearch() {
+  var zone   = document.getElementById('s_zone').value;
+  var month  = document.getElementById('s_month').value;
+  var status = document.getElementById('s_status').value;
+  selectedIds = []; allSelected = false;
+  document.getElementById('resList').innerHTML = '<div class="list-empty">Loading...</div>';
+  google.script.run
+    .withSuccessHandler(function(records) {
+      allRecords = records || [];
+      populateMonthsFromRecords(allRecords);
+      filtered = allRecords.filter(function(r) {
+        var mZone  = !zone  || String(r.zone || '').trim() === zone;
+        var mMonth = !month || auditYearMonth(r) === month;
+        var st = (r.status || '').toLowerCase();
+        var isPD = isPastDue(r);
+        var mStatus = !status
+          || (status === 'open'     && (st === 'open' || st === '') && !isPD)
+          || (status === 'pastdue'  && isPD)
+          || (status === 'complete' && (st.indexOf('complete') !== -1 || st.indexOf('closed') !== -1));
+        return mZone && mMonth && mStatus;
+      });
+      renderList(filtered);
+      updateSelCount();
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('resList').innerHTML =
+        '<div class="list-empty">Error: ' + esc(String(e&&e.message?e.message:e)) + '</div>';
+    })
+    .getCARecords();
+}
+
+function onZoneFilterChange() {
+  updateSelCount();
+}
+
+function isPastDue(r) {
+  var s = (r.status || '').toLowerCase();
+  if (s.indexOf('complete') !== -1 || s.indexOf('removed') !== -1 || s.indexOf('closed') !== -1) return false;
+  var d = new Date(r.dueDate);
+  return r.dueDate && !isNaN(d) && d < new Date();
+}
+
+function renderList(records) {
+  if (!records.length) {
+    document.getElementById('resList').innerHTML = '<div class="list-empty">No records found.</div>';
+    return;
+  }
+  var open      = records.filter(function(r){ return !isComplete(r); });
+  var completed = records.filter(function(r){ return isComplete(r); });
+  var html = '';
+  if (open.length) {
+    html += '<div class="section-hdr">Open &amp; in progress<span class="section-ct">'+open.length+'</span></div>';
+    open.forEach(function(r){ html += makeCard(r, true); });
+  }
+  if (open.length && completed.length) html += '<div class="section-div"></div>';
+  if (completed.length) {
+    html += '<div class="section-hdr">Completed<span class="section-ct">'+completed.length+'</span></div>';
+    completed.forEach(function(r){ html += makeCard(r, false); });
+  }
+  document.getElementById('resList').innerHTML = html;
+  reapplyActiveCard();
+}
+
+function isComplete(r) {
+  var s = (r.status || '').toLowerCase();
+  return s.indexOf('complete') !== -1 || s.indexOf('removed') !== -1 || s.indexOf('closed') !== -1;
+}
+
+function makeCard(r, selectable) {
+  var isPD = isPastDue(r);
+  var st   = (r.status || '').toLowerCase();
+  var sc   = isPD ? 'st-pd' : st.indexOf('closed') !== -1 ? 'st-cl' : st.indexOf('complete') !== -1 ? 'st-cp' : st.indexOf('removed') !== -1 ? 'st-rm' : 'st-op';
+  var stl  = isPD ? 'Past Due' : st.indexOf('closed') !== -1 ? 'Closed' : st.indexOf('complete') !== -1 ? 'Complete' : st.indexOf('removed') !== -1 ? 'Removed' : 'Open';
+  var lvl  = (r.ncLevel || '').toLowerCase();
+  var lc   = lvl==='critical'?'lv-c':lvl==='major'?'lv-m':lvl==='minor'?'lv-n':'lv-o';
+  var isSel = selectedIds.indexOf(r.carId) !== -1;
+  var checkbox = selectable
+    ? '<input type="checkbox" class="rc-check" '+(isSel?'checked':'')+' onchange="toggleRecord(\''+esc(r.carId)+'\',this.checked)" onclick="event.stopPropagation()">'
+    : '';
+  return '<div class="rc" onclick="selectRecord(\''+esc(r.carId)+'\')">'
+    + '<div class="rc-row">'
+    + checkbox
+    + '<div class="rc-body">'
+    + '<div class="rc-id">'+esc(r.carId)+'</div>'
+    + '<div class="rc-item">'+esc(r.inspectionItem||r.description||'—')+'</div>'
+    + '<div class="rc-loc">'+esc(r.locationInZone||'—')+'</div>'
+    + '<div class="rc-meta"><span class="lv-pill '+lc+'">'+esc(r.ncLevel||'Minor')+'</span>'
+    + '<span class="st-pill '+sc+'">'+stl+'</span></div>'
+    + '</div></div></div>';
+}
+
+// ── MULTI-SELECT FOR SEND NOTIFICATION ─────────────────────────
+function toggleRecord(carId, checked) {
+  if (checked) {
+    if (selectedIds.indexOf(carId) === -1) selectedIds.push(carId);
+  } else {
+    selectedIds = selectedIds.filter(function(id){ return id !== carId; });
+  }
+  updateSelCount();
+}
+
+function toggleSelectAll() {
+  var openIds = filtered.filter(function(r){ return !isComplete(r); }).map(function(r){ return r.carId; });
+  allSelected = !allSelected;
+  selectedIds = allSelected ? openIds.slice() : [];
+  document.getElementById('btnSelectAll').textContent = (allSelected ? '☑' : '☐') + ' Select all open';
+  renderList(filtered);
+  updateSelCount();
+}
+
+function updateSelCount() {
+  var zone    = document.getElementById('s_zone').value;
+  var n       = selectedIds.length;
+  var countEl = document.getElementById('selCount');
+  var btn     = document.getElementById('btnSend');
+  var btnP    = document.getElementById('btnPrintSel');
+  if (btnP) btnP.disabled = (n === 0);
+  if (!zone) {
+    countEl.textContent = 'Select a specific zone to send notifications';
+    btn.disabled = true;
+    return;
+  }
+  countEl.textContent = n + ' record'+(n!==1?'s':'')+' selected';
+  btn.disabled = (n === 0);
+}
+
+// ── SELECT RECORD ─────────────────────────────────────────────
+function selectRecord(carId) {
+  var r = allRecords.find(function(x){ return x.carId === carId; });
+  if (!r) return;
+  selectedRec    = r;
+  selectedStatus = r.status || 'Open';
+  newPhotos      = [];
+  existingPhotoData = [];
+  reapplyActiveCard();
+  renderForm(r);
+}
+
+// Re-highlights whichever card is open for editing — needed after any
+// re-render (search, select-all) since the DOM gets rebuilt from scratch.
+function reapplyActiveCard() {
+  document.querySelectorAll('.rc').forEach(function(c){ c.classList.remove('active'); });
+  if (!selectedRec) return;
+  document.querySelectorAll('.rc').forEach(function(c){
+    if (c.querySelector('.rc-id') && c.querySelector('.rc-id').textContent === selectedRec.carId)
+      c.classList.add('active');
+  });
+}
+
+// ── RENDER FORM ───────────────────────────────────────────────
+function renderForm(r) {
+  var lvl      = (r.ncLevel || '').toLowerCase();
+  var lvlClass = lvl==='critical'?'nc-c':lvl==='major'?'nc-m':lvl==='minor'?'nc-n':'nc-o';
+  var zname    = ZONE_NAMES[String(r.zone).trim()] || 'Zone ' + r.zone;
+  var isPD     = isPastDue(r);
+
+  document.getElementById('rightPanel').innerHTML =
+
+    // SCREEN HEADER — hidden on print
+    '<div class="form-header" id="fmHdr">'
+    + '<div class="fh-left"><h2>Update CA Record</h2><p>'+esc(r.carId)+' &nbsp;·&nbsp; '+esc(r.inspectionItem||'—')+'</p></div>'
+    + '<div class="fh-right">'
+    + '<button class="btn-clear-rpt" onclick="clearForm()">✕ Clear</button>'
+    + '<button class="btn-print" onclick="doPrint()">🖨 Print / Save PDF</button>'
+    + '<button class="btn-save" id="btnSave" onclick="submitUpdate()">Save changes →</button>'
+    + '</div></div>'
+
+    // ── PRINTABLE REPORT STARTS HERE ──────────────────────────
+    + '<div id="printSection" style="padding:14px">'
+
+    // REPORT HEADER
+    + '<div style="display:grid;grid-template-columns:140px 1fr 180px;border-bottom:3px solid #1E3A52;border:.5px solid #D0D7E8;background:#fff;margin-bottom:2px">'
+    + '<div style="padding:10px 12px;border-right:.5px solid #D0D7E8;background:#0F2D5C;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">'
+    + '<div style="font-size:11px;font-weight:bold;color:#fff;line-height:1.4">Container<br>Supply Co.</div>'
+    + '<div style="font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;margin-top:3px">Garden Grove, CA</div>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;justify-content:center;padding:10px 14px;border-right:.5px solid #D0D7E8;text-align:center">'
+    + '<h1 style="font-size:14px;font-weight:bold;color:#1E3A52;line-height:1.4">Facility Self Audit<br>Corrective Action Form</h1>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;justify-content:center">'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;border-bottom:.5px solid #D0D7E8;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Doc No.</span><span style="font-weight:bold;color:#1E3A52">FRM-018-004</span></div>'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;border-bottom:.5px solid #D0D7E8;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Revision</span><span style="font-weight:bold;color:#1E3A52">0</span></div>'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Rev. Date</span><span style="font-weight:bold;color:#1E3A52">07/17/2026</span></div>'
+    + '</div></div>'
+
+    // SECTION 1
+    + '<div class="sh">Section 1 — Nonconformance identification</div>'
+    + '<div class="info-card">'
+    + '<div class="info-grid info-grid-4" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">CAR ID</span><span class="iv mono">'+esc(r.carId)+'</span></div>'
+    + '<div class="info-field"><span class="il">NC Date</span><span class="iv">'+esc(r.ncDate||'—')+'</span></div>'
+    + '<div class="info-field"><span class="il">Zone</span><span class="iv">Zone '+esc(r.zone||'—')+' — '+esc(zname)+'</span></div>'
+    + '<div class="info-field"><span class="il">Audit Date</span><span class="iv">'+esc(r.auditDate||'—')+'</span></div>'
+    + '</div>'
+    + '<div class="info-grid info-grid-2" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">Inspection Item</span><span class="iv">'+esc(r.inspectionItem||'—')+'</span></div>'
+    + '<div class="info-field"><span class="il">Location within zone</span><span class="iv">'+esc(r.locationInZone||'—')+'</span></div>'
+    + '</div>'
+    + '<div class="info-grid info-grid-2" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">NC Level</span><span class="iv"><span class="nc-pill '+lvlClass+'">'+esc(r.ncLevel||'—')+'</span></span></div>'
+    + '<div class="info-field"><span class="il">Due Date</span><span class="iv" style="color:'+(isPD?'#991B1B':'inherit')+';font-weight:'+(isPD?'bold':'normal')+'">'+esc(r.dueDate||'—')+(isPD?' ⚠ Past due':'')+'</span></div>'
+    + '</div>'
+    + '<div class="info-field full"><span class="il">Description</span><span class="iv long">'+esc(r.description||'—')+'</span></div>'
+    + '</div>'
+
+    // SECTION 2 — PHOTOS
+    + '<div class="sh sh2">Section 2 — Supporting images</div>'
+    + '<div class="info-card">'
+    + '<div class="il" style="margin-bottom:6px">Existing photos</div>'
+    + '<div id="existingPhotos" class="existing-photos">'
+    + (r.photoLink && r.photoLink.trim()
+        ? '<div class="photo-loading">Loading photos from Drive...</div>'
+        : '<div style="font-size:10px;color:var(--muted);font-style:italic">No photos attached yet.</div>')
+    + '</div>'
+    // Add photos button — hidden on print
+    + '<div id="addPhotoControls" style="margin-top:10px">'
+    + '<div class="il" style="margin-bottom:6px">Add photos</div>'
+    + '<label class="photo-btn-label"><input type="file" id="newPhotoInput" accept="image/*" capture="environment" multiple onchange="handleNewPhotos(this)"> 📷 Tap to take or upload photos</label>'
+    + '<div class="photo-grid" id="newPhotoThumbs"></div>'
+    + '</div>'
+    + '</div>'
+
+    // SECTION 3 — CORRECTIVE ACTION
+    + '<div class="sh sh3">Section 3 — Corrective Action</div>'
+    + '<div class="edit-card">'
+    + '<div class="field full" style="margin-bottom:10px">'
+    + '<label>Corrective Action Plan <span class="req" id="caReq">(required to mark Complete)</span></label>'
+    + '<textarea id="caAction" placeholder="Describe the action that must be taken to correct this finding (e.g., Remove debris from aisle, Seal and tape all open boxes, Re-label waste container)">'+(r.correctiveAction||'')+'</textarea>'
+    + '</div>'
+    + '<div class="field-grid field-grid-2">'
+    + '<div class="field"><label>Completed By <span class="req" id="respReq">(required to mark Complete)</span></label><input type="text" id="respPerson" value="'+esc(r.responsiblePerson||'')+'" placeholder="Name"></div>'
+    + '<div class="field"><label>Assigned By (dept. head)</label><input type="text" id="assignedBy" value="'+esc(r.assignedBy||'')+'" placeholder="Dept. head or supervisor"></div>'
+    + '</div>'
+    // Print view of Section 3 — the editable textarea/inputs above are
+    // hidden on print (like every other .edit-card field), so without this
+    // the Corrective Action Plan never showed up in the printed/saved PDF.
+    + '<div class="info-card" style="display:none" id="printCorrectiveAction">'
+    + '<div class="info-field full"><span class="il">Corrective Action Plan</span><span class="iv long" id="printCAText"></span></div>'
+    + '<div class="info-grid info-grid-2" style="margin-top:8px">'
+    + '<div class="info-field"><span class="il">Completed By</span><span class="iv" id="printRespPerson"></span></div>'
+    + '<div class="info-field"><span class="il">Assigned By</span><span class="iv" id="printAssignedBy"></span></div>'
+    + '</div></div>'
+    + '</div>'
+
+    // SECTION 4 — VERIFICATION AND CLOSURE
+    + '<div class="sh sh4">Section 4 — Verification and Closure</div>'
+    + '<div class="edit-card">'
+    + '<div class="field-grid field-grid-3" style="margin-bottom:12px">'
+    + '<div class="field"><label style="display:block;min-height:24px">Completion Date <span class="req" id="compReq">(required to mark Complete)</span></label><input type="date" id="compDate" value="'+esc(r.completionDate||'')+'"></div>'
+    + '<div class="field"><label style="display:block;min-height:24px">Verification Date</label><input type="date" id="verifyDate" value="'+esc(r.verificationDate||'')+'"></div>'
+    + '<div class="field"><label style="display:block;min-height:24px">Verified By</label><input type="text" id="verifiedBy" value="'+esc(r.verifiedBy||'')+'" placeholder="QA / Compliance Manager"></div>'
+    + '</div>'
+    + '<div class="field"><label>Status</label>'
+    + '<div class="status-pills" style="margin-top:4px">'
+    + makeStatusBtn('Complete','Complete','sel-cp',r.status)
+    + makeStatusBtn('Open','Open','sel-op',r.status)
+    + makeStatusBtn('Past Due','Past Due','sel-pd',r.status)
+    + makeStatusBtn('Removed','Removed','sel-rm',r.status)
+    + '</div></div>'
+    + '<div class="field" style="margin-top:10px">'
+    + '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:12px">'
+    + '<input type="checkbox" id="closeCA" style="width:16px;height:16px;accent-color:var(--steel);cursor:pointer"'+((r.status||'').toLowerCase().indexOf('closed')!==-1?' checked':'')+' onchange="toggleCloseCA(this.checked)">'
+    + 'Close this CA <span style="font-weight:normal;color:var(--muted)">(only once Complete — requires Verified By and Verification Date)</span></label>'
+    + '</div>'
+    // Print view of completion — shown on print only
+    + '<div class="cl-grid" style="display:none" id="printCompletion">'
+    + '<div class="cl-cell"><div class="cl-lbl">Completion Date</div><div class="cl-val">'+esc(r.completionDate||'')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Verification Date</div><div class="cl-val">'+esc(r.verificationDate||'')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Verified By</div><div class="cl-val">'+esc(r.verifiedBy||'')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Status</div><div class="cl-val">'+esc(r.status||'Open')+'</div></div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="font-size:8px;color:var(--muted);text-align:center;padding:4px 14px;border-top:.5px solid var(--border);background:var(--slate)">This document is confidential. Printed copies are uncontrolled.</div>'
+    + '<div style="background:var(--steel-bg);padding:5px 12px;display:flex;justify-content:space-between;font-size:9px;color:var(--muted);border-top:.5px solid var(--border);flex-wrap:wrap;gap:3px">'
+    + '<span>FRM-018-004 · Rev. 0 · Facility Self Audit Corrective Action Form</span>'
+    + '<span>Container Supply Co. — Garden Grove, CA</span>'
+    + '<span>Printed: '+todayStr()+'</span>'
+    + '</div>'
+
+    + '</div>'; // end printSection
+
+  // Load existing photos from Drive async
+  if (r.photoLink && r.photoLink.trim()) {
+    google.script.run
+      .withSuccessHandler(function(photos) {
+        existingPhotoData = photos || [];
+        var container = document.getElementById('existingPhotos');
+        if (!container) return;
+        if (!photos || !photos.length) {
+          container.innerHTML = '<div style="font-size:10px;color:var(--muted);font-style:italic">Could not load photos. Ensure Drive files are shared.</div>';
+          return;
+        }
+        var html = '';
+        photos.forEach(function(p, i) {
+          html += '<div class="existing-photo"><img src="'+p.dataUrl+'" alt="Photo '+(i+1)+'">'
+            + '<div class="existing-photo-lbl">Photo '+(i+1)+'</div></div>';
+        });
+        container.innerHTML = html;
+      })
+      .withFailureHandler(function() {
+        var c = document.getElementById('existingPhotos');
+        if (c) c.innerHTML = '<div style="font-size:10px;color:var(--muted);font-style:italic">Could not load photos.</div>';
+      })
+      .getCARPhotosBase64(r.photoLink);
+  }
+}
+
+// ── PRINT ─────────────────────────────────────────────────────
+function doPrint() {
+  // Before printing, update the print-only Corrective Action block with
+  // current field values — the editable textarea/inputs above it are
+  // hidden on print like every other .edit-card field.
+  var caAction   = (document.getElementById('caAction')   || {}).value || '';
+  var respPerson = (document.getElementById('respPerson') || {}).value || '';
+  var assignedBy = (document.getElementById('assignedBy') || {}).value || '';
+  var pca = document.getElementById('printCorrectiveAction');
+  if (pca) {
+    pca.style.display = 'block';
+    document.getElementById('printCAText').textContent      = caAction || '—';
+    document.getElementById('printRespPerson').textContent   = respPerson || '—';
+    document.getElementById('printAssignedBy').textContent   = assignedBy || '—';
+  }
+
+  // Before printing, update the print-only completion block with current field values
+  var compDate  = (document.getElementById('compDate')   || {}).value || '';
+  var verDate   = (document.getElementById('verifyDate') || {}).value || '';
+  var verBy     = (document.getElementById('verifiedBy') || {}).value || '';
+  var pc = document.getElementById('printCompletion');
+  if (pc) {
+    pc.style.display = 'grid';
+    pc.innerHTML =
+      '<div class="cl-cell"><div class="cl-lbl">Completion Date</div><div class="cl-val">'+esc(compDate||'—')+'</div></div>'
+      + '<div class="cl-cell"><div class="cl-lbl">Verification Date</div><div class="cl-val">'+esc(verDate||'—')+'</div></div>'
+      + '<div class="cl-cell"><div class="cl-lbl">Verified By</div><div class="cl-val">'+esc(verBy||'—')+'</div></div>'
+      + '<div class="cl-cell"><div class="cl-lbl">Status</div><div class="cl-val">'+esc(selectedStatus||'Open')+'</div></div>';
+  }
+  window.print();
+}
+
+// ── BATCH PRINT (multiple records selected via the checkboxes) ────────────
+// Reuses the same read-only report layout as the single-record print view,
+// but built straight from record data (no live form inputs exist for
+// records other than the one currently open), concatenated with a page
+// break between each so the whole batch saves/prints as one PDF.
+function printSelectedRecords() {
+  if (!selectedIds.length) { showToast('Select at least one record to print.', 'err'); return; }
+  var recs = filtered.filter(function(r){ return selectedIds.indexOf(r.carId) !== -1; });
+  if (!recs.length) return;
+
+  var btn = document.getElementById('btnPrintSel');
+  if (btn) { btn.disabled = true; btn.textContent = 'Preparing...'; }
+
+  var photoResults = new Array(recs.length);
+  var remaining = recs.length;
+
+  recs.forEach(function(r, idx) {
+    if (r.photoLink && r.photoLink.trim()) {
+      google.script.run
+        .withSuccessHandler(function(photos) { photoResults[idx] = photos || []; checkDone(); })
+        .withFailureHandler(function() { photoResults[idx] = []; checkDone(); })
+        .getCARPhotosBase64(r.photoLink);
+    } else {
+      photoResults[idx] = [];
+      checkDone();
+    }
+  });
+
+  function checkDone() {
+    remaining--;
+    if (remaining > 0) return;
+    var html = recs.map(function(r, i) { return buildReportHTML(r, photoResults[i], i > 0); }).join('');
+    var section = document.getElementById('batchPrintSection');
+    section.innerHTML = html;
+
+    // Photos are injected as fresh base64 <img> tags here, unlike the
+    // single-record print (already on screen and decoded long before the
+    // user clicks Print) — with many images at once, calling window.print()
+    // immediately can beat the browser's decode/paint, so images come out
+    // blank. Wait for every image to actually load first.
+    waitForImagesToLoad(section, function() {
+      document.body.classList.add('batch-printing');
+      window.print();
+      document.body.classList.remove('batch-printing');
+      section.innerHTML = '';
+      if (btn) { btn.disabled = selectedIds.length === 0; btn.textContent = '🖨 Print / Save selected →'; }
+    });
+  }
+}
+
+// Waits for every <img> inside a container to finish loading (or error out),
+// with a safety timeout, then calls done(). Shared by batch print and the
+// PDF-render path below — both inject fresh base64 images right before an
+// operation (print / canvas capture) that needs them already painted.
+function waitForImagesToLoad(container, done) {
+  var imgs = container.querySelectorAll('img');
+  if (!imgs.length) { done(); return; }
+  var remaining = imgs.length, finished = false;
+  function tick() {
+    if (finished) return;
+    remaining--;
+    if (remaining <= 0) { finished = true; done(); }
+  }
+  imgs.forEach(function(img) {
+    if (img.complete && img.naturalWidth > 0) { tick(); return; }
+    img.addEventListener('load', tick);
+    img.addEventListener('error', tick);
+  });
+  setTimeout(function(){ if (!finished) { finished = true; done(); } }, 4000);
+}
+
+// ── EMAIL PDF RENDERING (client-side, pixel-matches the on-screen report) ──
+// The emailed/Drive-saved report used to be built server-side with
+// DocumentApp (Google Docs), which can't reproduce this page's CSS layout,
+// colors, or pill badges. Instead we render the exact same report markup
+// used for print, rasterize it with html2canvas, and assemble a PDF with
+// jsPDF — so the saved/emailed PDF looks identical to what's on screen.
+function renderRecordToPdfBase64(record, photos) {
+  var container = document.getElementById('pdfRenderSection');
+  container.innerHTML = buildReportHTML(record, photos, false);
+
+  return new Promise(function(resolve, reject) {
+    waitForImagesToLoad(container, function() {
+      html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+        .then(function(canvas) {
+          var jsPDFCtor  = window.jspdf.jsPDF;
+          var pdf        = new jsPDFCtor({ unit: 'pt', format: 'letter' });
+          var pageWidth  = pdf.internal.pageSize.getWidth();
+          var pageHeight = pdf.internal.pageSize.getHeight();
+          var imgWidth   = pageWidth;
+          var imgHeight  = canvas.height * (imgWidth / canvas.width);
+          var imgData    = canvas.toDataURL('image/jpeg', 0.92);
+
+          // Multi-page slicing: redraw the same full-height image on each
+          // page, shifted up by one page height per page — jsPDF clips
+          // whatever falls outside the current page's boundaries.
+          var heightLeft = imgHeight, position = 0;
+          pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+          while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          container.innerHTML = '';
+          var dataUri = pdf.output('datauristring');
+          resolve(dataUri.split(',')[1]);
+        })
+        .catch(function(err) { container.innerHTML = ''; reject(err); });
+    });
+  });
+}
+
+// Read-only report layout for one record — used by the batch print path.
+function buildReportHTML(r, photos, pageBreak) {
+  var lvl      = (r.ncLevel || '').toLowerCase();
+  var lvlClass = lvl==='critical'?'nc-c':lvl==='major'?'nc-m':lvl==='minor'?'nc-n':'nc-o';
+  var zname    = ZONE_NAMES[String(r.zone).trim()] || 'Zone ' + r.zone;
+  var isPD     = isPastDue(r);
+  var photosHtml = (photos && photos.length)
+    ? photos.map(function(p, i) {
+        return '<div class="existing-photo"><img src="'+p.dataUrl+'" alt="Photo '+(i+1)+'">'
+          + '<div class="existing-photo-lbl">Photo '+(i+1)+'</div></div>';
+      }).join('')
+    : '<div style="font-size:10px;color:var(--muted);font-style:italic">No photos attached.</div>';
+
+  return (pageBreak ? '<div style="page-break-before:always"></div>' : '')
+    + '<div style="padding:14px">'
+
+    + '<div style="display:grid;grid-template-columns:140px 1fr 180px;border-bottom:3px solid #1E3A52;border:.5px solid #D0D7E8;background:#fff;margin-bottom:2px">'
+    + '<div style="padding:10px 12px;border-right:.5px solid #D0D7E8;background:#0F2D5C;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">'
+    + '<div style="font-size:11px;font-weight:bold;color:#fff;line-height:1.4">Container<br>Supply Co.</div>'
+    + '<div style="font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;margin-top:3px">Garden Grove, CA</div>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;justify-content:center;padding:10px 14px;border-right:.5px solid #D0D7E8;text-align:center">'
+    + '<h1 style="font-size:14px;font-weight:bold;color:#1E3A52;line-height:1.4">Facility Self Audit<br>Corrective Action Form</h1>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;justify-content:center">'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;border-bottom:.5px solid #D0D7E8;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Doc No.</span><span style="font-weight:bold;color:#1E3A52">FRM-018-004</span></div>'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;border-bottom:.5px solid #D0D7E8;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Revision</span><span style="font-weight:bold;color:#1E3A52">0</span></div>'
+    + '<div style="display:flex;align-items:center;padding:5px 10px;font-size:10px"><span style="color:#6B7280;font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0">Rev. Date</span><span style="font-weight:bold;color:#1E3A52">07/17/2026</span></div>'
+    + '</div></div>'
+
+    + '<div class="sh">Section 1 — Nonconformance identification</div>'
+    + '<div class="info-card">'
+    + '<div class="info-grid info-grid-4" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">CAR ID</span><span class="iv mono">'+esc(r.carId)+'</span></div>'
+    + '<div class="info-field"><span class="il">NC Date</span><span class="iv">'+esc(r.ncDate||'—')+'</span></div>'
+    + '<div class="info-field"><span class="il">Zone</span><span class="iv">Zone '+esc(r.zone||'—')+' — '+esc(zname)+'</span></div>'
+    + '<div class="info-field"><span class="il">Audit Date</span><span class="iv">'+esc(r.auditDate||'—')+'</span></div>'
+    + '</div>'
+    + '<div class="info-grid info-grid-2" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">Inspection Item</span><span class="iv">'+esc(r.inspectionItem||'—')+'</span></div>'
+    + '<div class="info-field"><span class="il">Location within zone</span><span class="iv">'+esc(r.locationInZone||'—')+'</span></div>'
+    + '</div>'
+    + '<div class="info-grid info-grid-2" style="margin-bottom:8px">'
+    + '<div class="info-field"><span class="il">NC Level</span><span class="iv"><span class="nc-pill '+lvlClass+'">'+esc(r.ncLevel||'—')+'</span></span></div>'
+    + '<div class="info-field"><span class="il">Due Date</span><span class="iv" style="color:'+(isPD?'#991B1B':'inherit')+';font-weight:'+(isPD?'bold':'normal')+'">'+esc(r.dueDate||'—')+(isPD?' ⚠ Past due':'')+'</span></div>'
+    + '</div>'
+    + '<div class="info-field full"><span class="il">Description</span><span class="iv long">'+esc(r.description||'—')+'</span></div>'
+    + '</div>'
+
+    + '<div class="sh sh2">Section 2 — Supporting images</div>'
+    + '<div class="info-card">'
+    + '<div class="il" style="margin-bottom:6px">Photos</div>'
+    + '<div class="existing-photos">' + photosHtml + '</div>'
+    + '</div>'
+
+    + '<div class="sh sh3">Section 3 — Corrective Action</div>'
+    + '<div class="info-card">'
+    + '<div class="info-field full"><span class="il">Corrective Action Plan</span><span class="iv long">'+esc(r.correctiveAction||'—')+'</span></div>'
+    + '<div class="info-grid info-grid-2" style="margin-top:8px">'
+    + '<div class="info-field"><span class="il">Completed By</span><span class="iv">'+esc(r.responsiblePerson||'—')+'</span></div>'
+    + '<div class="info-field"><span class="il">Assigned By</span><span class="iv">'+esc(r.assignedBy||'—')+'</span></div>'
+    + '</div></div>'
+
+    + '<div class="sh sh4">Section 4 — Verification and Closure</div>'
+    + '<div class="edit-card">'
+    + '<div class="cl-grid" style="display:grid">'
+    + '<div class="cl-cell"><div class="cl-lbl">Completion Date</div><div class="cl-val">'+esc(r.completionDate||'—')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Verification Date</div><div class="cl-val">'+esc(r.verificationDate||'—')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Verified By</div><div class="cl-val">'+esc(r.verifiedBy||'—')+'</div></div>'
+    + '<div class="cl-cell"><div class="cl-lbl">Status</div><div class="cl-val">'+esc(r.status||'Open')+'</div></div>'
+    + '</div></div>'
+
+    + '<div style="font-size:8px;color:var(--muted);text-align:center;padding:4px 14px;border-top:.5px solid var(--border);background:var(--slate)">This document is confidential. Printed copies are uncontrolled.</div>'
+    + '<div style="background:var(--steel-bg);padding:5px 12px;display:flex;justify-content:space-between;font-size:9px;color:var(--muted);border-top:.5px solid var(--border);flex-wrap:wrap;gap:3px">'
+    + '<span>FRM-018-004 · Rev. 0 · Facility Self Audit Corrective Action Form</span>'
+    + '<span>Container Supply Co. — Garden Grove, CA</span>'
+    + '<span>Printed: '+todayStr()+'</span>'
+    + '</div>'
+
+    + '</div>';
+}
+
+// ── STATUS BUTTONS ────────────────────────────────────────────
+function makeStatusBtn(val, label, selClass, current) {
+  var cur = (current || 'Open');
+  var isSel = cur.toLowerCase() === val.toLowerCase()
+    || (val === 'Open' && (cur === '' || cur === 'Open'));
+  if (isSel) selectedStatus = val;
+  return '<button class="sp'+(isSel?' '+selClass:'')+'" data-val="'+val+'" onclick="setStatus(\''+val+'\',\''+selClass+'\',this)">'+label+'</button>';
+}
+
+// Closing is a step on top of Complete, not a replacement for it — you mark
+// the CA Complete first (via the pill), then close it once it's verified.
+// Closed has no pill of its own, so keep the checkbox and pills in sync manually.
+function toggleCloseCA(checked) {
+  var cb = document.getElementById('closeCA');
+  if (checked) {
+    if (selectedStatus !== 'Complete') {
+      showToast('Mark this CA Complete before closing it.', 'err');
+      if (cb) cb.checked = false;
+      return;
+    }
+    var verified = (document.getElementById('verifiedBy') || {}).value || '';
+    var verDate  = (document.getElementById('verifyDate') || {}).value || '';
+    if (!verified.trim() || !verDate) {
+      showToast('Verified By and Verification Date are required to close this CA.', 'err');
+      if (cb) cb.checked = false;
+      return;
+    }
+    selectedStatus = 'Closed';
+    document.querySelectorAll('.sp').forEach(function(b){ b.className = 'sp'; });
+  } else {
+    selectedStatus = 'Complete';
+    document.querySelectorAll('.sp').forEach(function(b){
+      b.className = 'sp' + (b.getAttribute('data-val') === 'Complete' ? ' sel-cp' : '');
+    });
+  }
+}
+
+function setStatus(val, cls, btn) {
+  selectedStatus = val;
+  var cb = document.getElementById('closeCA');
+  if (cb) cb.checked = false;
+  document.querySelectorAll('.sp').forEach(function(b){ b.className = 'sp'; });
+  btn.className = 'sp ' + cls;
+}
+
+// ── PHOTO HANDLERS ────────────────────────────────────────────
+function handleNewPhotos(input) {
+  var files = Array.from(input.files);
+  files.forEach(function(file) {
+    readPhotoAsDataUrl(file, function(name, dataUrl) {
+      newPhotos.push({ name: name, dataUrl: dataUrl });
+      renderNewThumbs();
+    });
+  });
+  input.value = '';
+}
+
+// iPhones default to saving camera photos as HEIC, which most browsers
+// (and Google Docs' image embed) can't decode — convert to JPEG up front
+// so thumbnails, print views, and PDF reports all get a format that renders.
+function isHeicFile(file) {
+  var type = (file.type || '').toLowerCase();
+  var name = (file.name || '').toLowerCase();
+  return type === 'image/heic' || type === 'image/heif'
+    || name.endsWith('.heic') || name.endsWith('.heif');
+}
+
+function readPhotoAsDataUrl(file, onDone) {
+  if (!isHeicFile(file)) {
+    var reader = new FileReader();
+    reader.onload = function(e) { onDone(file.name, e.target.result); };
+    reader.readAsDataURL(file);
+    return;
+  }
+  heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
+    .then(function(converted) {
+      var jpegBlob = Array.isArray(converted) ? converted[0] : converted;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var newName = file.name.replace(/\.(heic|heif)$/i, '') + '.jpg';
+        onDone(newName, e.target.result);
+      };
+      reader.readAsDataURL(jpegBlob);
+    })
+    .catch(function(err) {
+      console.error('HEIC conversion failed', err);
+      alert('Could not convert "' + file.name + '" from HEIC format — try re-saving it as JPEG before uploading.');
+    });
+}
+
+function renderNewThumbs() {
+  var container = document.getElementById('newPhotoThumbs');
+  if (!container) return;
+  var html = '';
+  newPhotos.forEach(function(p, i) {
+    html += '<div class="photo-thumb">'
+      + '<img src="' + p.dataUrl + '" alt="Photo ' + (i+1) + '" '
+      + 'style="width:80px;height:80px;object-fit:cover;border:0.5px solid #D0D7E8">'
+      + '<button class="photo-rm" onclick="removeNewPhoto(' + i + ')">&times;</button>'
+      + '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function removeNewPhoto(idx) {
+  newPhotos.splice(idx, 1);
+  renderNewThumbs();
+}
+
+// ── SAVE ──────────────────────────────────────────────────────
+function submitUpdate() {
+  if (!selectedRec) return;
+
+  var action   = (document.getElementById('caAction')   || {}).value || '';
+  var resp     = (document.getElementById('respPerson') || {}).value || '';
+  var comp     = (document.getElementById('compDate')   || {}).value || '';
+  var verDate  = (document.getElementById('verifyDate') || {}).value || '';
+  var verified = (document.getElementById('verifiedBy') || {}).value || '';
+  var asgn     = (document.getElementById('assignedBy') || {}).value || '';
+
+  // Only require CA fields if marking Complete (Closed implies Complete too)
+  if (selectedStatus === 'Complete' || selectedStatus === 'Closed') {
+    if (!action.trim()) { showToast('Corrective Action Plan is required to mark Complete.', 'err'); return; }
+    if (!resp.trim())   { showToast('Completed By is required to mark Complete.', 'err'); return; }
+    if (!comp)          { showToast('Completion Date is required to mark Complete.', 'err'); return; }
+  }
+  if (selectedStatus === 'Closed') {
+    if (!verified.trim()) { showToast('Verified By is required to close this CA.', 'err'); return; }
+    if (!verDate)          { showToast('Verification Date is required to close this CA.', 'err'); return; }
+  }
+
+  // Allow save with just photos and no other changes
+  var hasChanges = action || resp || comp || verDate || verified || asgn || newPhotos.length > 0 || selectedStatus !== (selectedRec.status || 'Open');
+  if (!hasChanges) { showToast('No changes to save.', 'err'); return; }
+
+  document.getElementById('btnSave').disabled = true;
+  document.getElementById('btnSave').textContent = 'Saving...';
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+      document.getElementById('btnSave').disabled = false;
+      document.getElementById('btnSave').textContent = 'Save changes →';
+      if (result && result.success) {
+        if (result.photoError) {
+          showToast('Saved, but photo could not be linked: ' + result.photoError, 'err');
+        } else {
+          showToast('Saved successfully.', 'ok');
+        }
+        newPhotos = [];
+        renderNewThumbs();
+        // Update local record
+        selectedRec.correctiveAction  = action  || selectedRec.correctiveAction;
+        selectedRec.responsiblePerson = resp    || selectedRec.responsiblePerson;
+        selectedRec.completionDate    = comp    || selectedRec.completionDate;
+        selectedRec.verificationDate  = verDate || selectedRec.verificationDate;
+        selectedRec.verifiedBy        = verified|| selectedRec.verifiedBy;
+        selectedRec.assignedBy        = asgn   || selectedRec.assignedBy;
+        selectedRec.status            = selectedStatus;
+        allRecords = allRecords.map(function(r){ return r.carId === selectedRec.carId ? selectedRec : r; });
+        doSearch();
+        setTimeout(function(){ selectRecord(selectedRec.carId); }, 400);
+      } else {
+        showToast('Error: '+((result&&result.message)||'Unknown error'), 'err');
+      }
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('btnSave').disabled = false;
+      document.getElementById('btnSave').textContent = 'Save changes →';
+      showToast('Error: '+String(e&&e.message?e.message:e), 'err');
+    })
+    .updateCARecord(selectedRec.carId, {
+      correctiveAction:  action,
+      responsiblePerson: resp,
+      assignedBy:        asgn,
+      completionDate:    comp,
+      verificationDate:  verDate,
+      verifiedBy:        verified,
+      status:            selectedStatus,
+      newPhotos:         newPhotos,
+    });
+}
+
+function clearForm() {
+  document.querySelectorAll('.rc').forEach(function(c){ c.classList.remove('active'); });
+  selectedRec = null; newPhotos = []; existingPhotoData = [];
+  document.getElementById('rightPanel').innerHTML =
+    '<div class="right-empty"><div class="empty-icon">📝</div>'
+    + '<div class="empty-txt">Select a CA record on the left<br>to view, add photos, or update it here.</div></div>';
+}
+
+// ── SEND NOTIFICATION — batch-email the zone lead ──────────────
+function openPreview() {
+  var zone = document.getElementById('s_zone').value;
+  if (!zone) { showToast('Please select a specific zone before sending.', 'err'); return; }
+  if (!selectedIds.length) { showToast('Select at least one record.', 'err'); return; }
+
+  // A prior send (success or failure) replaces this footer with a plain
+  // "Close" button that has no id="btnConfirm" — restore the original
+  // Cancel/Send footer every time, so the lookup below can't hit a null
+  // element and silently abort before the overlay even opens.
+  document.getElementById('pvFooter').innerHTML =
+    '<button class="btn-cancel-pv" onclick="closeOverlay()">Cancel</button>'
+    + '<button class="btn-confirm" id="btnConfirm" onclick="confirmSend()">Send email →</button>';
+  document.getElementById('pvFooter').style.display = 'flex';
+
+  document.getElementById('pvBody').innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-style:italic">Loading preview...</div>';
+  document.getElementById('btnConfirm').disabled = true;
+  document.getElementById('overlay').classList.add('show');
+  previewData = { carIds: selectedIds.slice(), zone: zone };
+
+  google.script.run
+    .withSuccessHandler(function(d) {
+      previewData.leadEmail = d.leadEmail;
+      renderPreview(d);
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('pvBody').innerHTML = '<div style="padding:20px;color:#991B1B">Error: '+esc(String(e&&e.message?e.message:e))+'</div>';
+    })
+    .getEmailPreviewData(selectedIds, zone);
+}
+
+function renderPreview(d) {
+  if (!d||!d.success) {
+    document.getElementById('pvBody').innerHTML = '<div style="padding:16px;color:#991B1B">'+esc((d&&d.message)||'Unknown error')+'</div>';
+    return;
+  }
+  var lc = function(l){ return l==='Critical'?'color:#7F1D1D;background:#FEF2F2':l==='Major'?'color:#78350F;background:#FFFBEB':l==='Minor'?'color:#1E3A8A;background:#EFF6FF':'color:#4B5563;background:#F3F4F6'; };
+  var noEmail = !d.leadEmail || d.leadEmail.indexOf('@') === -1;
+  var warn = noEmail ? '<div class="pv-warn">⚠ No email on file for this zone. Add it to the Zone Managers table in Settings.</div>' : '';
+  var recs = filtered.filter(function(r){ return selectedIds.indexOf(r.carId) !== -1; });
+
+  document.getElementById('pvBody').innerHTML = warn
+    + '<div class="pv-sec"><div class="pv-sec-title">Email details</div>'
+    + '<div class="pv-row"><span class="pv-lbl">To (zone lead)</span><span class="pv-val em">'+esc(d.leadName)+' &lt;'+esc(d.leadEmail)+'&gt;</span></div>'
+    + '<div class="pv-row"><span class="pv-lbl">CC</span><span class="pv-val em">'+esc(d.ccEmail||'—')+'</span></div>'
+    + '<div class="pv-row"><span class="pv-lbl">Department</span><span class="pv-val">'+esc(d.dept)+' (Zone '+esc(d.zone)+')</span></div>'
+    + '<div class="pv-row"><span class="pv-lbl">Attachments</span><span class="pv-val">'+d.count+' CA report PDF'+(d.count!==1?'s':'')+' (photos embedded)</span></div>'
+    + '<div class="pv-row"><span class="pv-lbl">PDFs saved to</span><span class="pv-val">'+(d.folderSet?'Drive (configured in Settings)':'<span style="color:#991B1B">Folder not set in Settings</span>')+'</span></div>'
+    + '</div>'
+    + '<div class="pv-sec"><div class="pv-sec-title">Reports included ('+d.count+')</div>'
+    + '<div class="pv-recs">'+recs.map(function(r){
+        return '<div class="pv-rec"><span class="pv-rec-id">'+esc(r.carId)+'</span>'
+          + '<span class="pv-rec-item">'+esc(r.inspectionItem||'—')+'</span>'
+          + '<span class="pv-rec-lv" style="font-size:8px;font-weight:bold;padding:1px 5px;'+lc(r.ncLevel)+'">'+esc(r.ncLevel||'')+'</span>'
+          + '</div>';
+      }).join('')+'</div></div>';
+
+  document.getElementById('btnConfirm').disabled = noEmail;
+}
+
+function confirmSend() {
+  if (!previewData) return;
+  document.getElementById('btnConfirm').disabled = true;
+  document.getElementById('pvFooter').style.display = 'none';
+
+  function setProgress(msg) {
+    document.getElementById('pvBody').innerHTML =
+      '<div style="padding:28px;text-align:center">'
+      + '<div style="font-size:13px;color:var(--steel);font-weight:bold;margin-bottom:8px">'+esc(msg)+'</div>'
+      + '<div style="font-size:11px;color:#888;font-style:italic">This may take a moment. Please wait.</div>'
+      + '</div>';
+  }
+
+  function showFailure(msg) {
+    document.getElementById('pvBody').innerHTML =
+      '<div style="padding:20px;text-align:center">'
+      + '<div style="font-size:20px;margin-bottom:8px">❌</div>'
+      + '<div style="font-size:12px;font-weight:bold;color:#991B1B;margin-bottom:6px">Send failed</div>'
+      + '<div style="font-size:11px;color:#555">'+esc(msg||'Unknown error')+'</div>'
+      + '</div>';
+    document.getElementById('pvFooter').innerHTML = '<button class="btn-cancel-pv" onclick="closeOverlay()">Close</button>';
+    document.getElementById('pvFooter').style.display = 'flex';
+  }
+
+  var recs = filtered.filter(function(r){ return previewData.carIds.indexOf(r.carId) !== -1; });
+  if (!recs.length) { showFailure('No matching records found.'); return; }
+
+  var pdfPayload = [];
+  var idx = 0;
+
+  function renderNext() {
+    if (idx >= recs.length) { sendToServer(); return; }
+    var r = recs[idx];
+    setProgress('Rendering report ' + (idx + 1) + ' of ' + recs.length + '...');
+
+    function proceed(photos) {
+      renderRecordToPdfBase64(r, photos)
+        .then(function(base64) {
+          pdfPayload.push({ carId: r.carId, base64: base64 });
+          idx++;
+          renderNext();
+        })
+        .catch(function(err) {
+          showFailure('Could not render ' + r.carId + ': ' + (err && err.message ? err.message : err));
+        });
+    }
+
+    if (r.photoLink && r.photoLink.trim()) {
+      google.script.run
+        .withSuccessHandler(proceed)
+        .withFailureHandler(function(){ proceed([]); })
+        .getCARPhotosBase64(r.photoLink);
+    } else {
+      proceed([]);
+    }
+  }
+
+  function sendToServer() {
+    setProgress('Sending email...');
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result&&result.success) {
+          document.getElementById('pvBody').innerHTML =
+            '<div style="padding:24px;text-align:center">'
+            + '<div style="font-size:24px;margin-bottom:8px">✅</div>'
+            + '<div style="font-size:13px;font-weight:bold;color:#166534;margin-bottom:6px">Email sent successfully</div>'
+            + '<div style="font-size:11px;color:#555;margin-bottom:4px">'+result.count+' report(s) sent to zone lead</div>'
+            + (result.folderUrl?'<div style="font-size:10px;color:#888">PDFs saved to Drive. <a href="'+esc(result.folderUrl)+'" target="_blank" style="color:var(--steel)">Open folder</a></div>':'')
+            + '</div>';
+          document.getElementById('pvFooter').innerHTML = '<button class="btn-confirm" onclick="closeOverlay()">Close</button>';
+          document.getElementById('pvFooter').style.display = 'flex';
+          selectedIds = []; allSelected = false;
+          updateSelCount();
+          doSearch();
+        } else {
+          showFailure(result && result.message);
+        }
+      })
+      .withFailureHandler(function(e) {
+        showFailure(String(e && e.message ? e.message : e));
+      })
+      .generateAndEmailCARReportsFromPDFs(previewData.carIds, previewData.zone, pdfPayload);
+  }
+
+  renderNext();
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('pvFooter').style.display = 'flex';
+  previewData = null;
+}
+
+function todayStr(){ var d=new Date();return String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+'/'+d.getFullYear();}
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (type||'');
+  setTimeout(function(){ el.classList.remove('show'); }, 3500);
+}
+function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
