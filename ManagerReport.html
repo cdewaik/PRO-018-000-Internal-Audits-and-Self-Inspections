@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base target="_top">
+<title>Facility Audit Performance Report</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F2D5C;--steel:#2D5F82;--steel-l:#4A7FA5;--steel-bg:#E8EEF4;--steel-mid:#B8CDD9;
+  --dark:#1E3A52;--muted:#6B7280;--border:#D0D7E8;--slate:#F7F9FB;
+  --red:#991B1B;--red-bg:#FEF2F2;--red-bd:#FECACA;
+  --green:#166534;--green-bg:#F0FDF4;--green-bd:#86EFAC;
+  --amber:#92400E;--amber-bg:#FFFBEB;--amber-bd:#FCD34D;
+  --grey-bg:#F3F4F6;--grey-fg:#4B5563;
+  --maint-bg:#EFF6FF;--maint-fg:#1E40AF;--maint-c:#4A7FA5;
+  --sanit-bg:#F0FDF4;--sanit-fg:#166534;--sanit-c:#5DA37A;
+  --gmp-bg:#F5F3FF;--gmp-fg:#4C1D95;--gmp-c:#7F77DD;
+  --safety-bg:#FFF7ED;--safety-fg:#7C2D12;--safety-c:#D85A30;
+}
+html,body{font-family:Arial,sans-serif;font-size:12px;color:#1A1A2E;background:#EEF1F6;margin:0;padding:0;height:100%;overflow:hidden}
+.layout{display:flex;height:100vh;overflow:hidden}
+
+/* LEFT PANEL */
+.left-panel{width:220px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;overflow-y:auto;padding-bottom:20px}
+.left-panel::-webkit-scrollbar{width:4px}
+.left-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+.lp-head{padding:14px 12px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.lp-head-title{font-size:13px;font-weight:bold;color:#fff;line-height:1.3}
+.lp-head-sub{font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+.lp-section{padding:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.lp-lbl{font-size:9px;font-weight:bold;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.lp-select{width:100%;padding:6px 8px;border:0.5px solid rgba(255,255,255,.15);border-radius:0;font-size:10px;background:rgba(255,255,255,.07);color:#fff;font-family:Arial;margin-bottom:8px;cursor:pointer}
+.lp-select option{background:#0F2D5C;color:#fff}
+.lp-date-strip{background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);padding:7px 9px;font-size:9px;color:#B5D4F4;line-height:1.6}
+.lp-date-row{display:flex;gap:6px}
+.lp-date-col{flex:1;min-width:0}
+.lp-date-mini-lbl{font-size:8px;font-weight:bold;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px}
+.lp-date-input{margin-bottom:8px;color-scheme:dark}
+.lp-date-strip strong{color:#fff;font-size:10px;display:block;margin-bottom:1px}
+.btn-lp-print{width:100%;padding:9px;background:#2D5F82;color:#fff;border:none;border-radius:0;font-size:11px;font-weight:bold;cursor:pointer;font-family:Arial;letter-spacing:.02em}
+.btn-lp-print:hover{background:#4A7FA5}
+.lp-kpi-summary{padding:12px}
+.lp-kpi-item{margin-bottom:12px}
+.lp-kpi-val{font-size:22px;font-weight:bold;color:#fff;line-height:1}
+.lp-kpi-lbl{font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.lp-kpi-sub{font-size:9px;color:rgba(255,255,255,.35);margin-top:1px}
+.lp-divider{height:0.5px;background:rgba(255,255,255,.08);margin:8px 0}
+
+/* RIGHT PANEL */
+.right-panel{flex:1;overflow-y:auto;background:#EEF1F6}
+.page{max-width:1060px;margin:0 auto;padding:14px}
+
+/* REPORT HEADER */
+.rpt-header{display:grid;grid-template-columns:140px 1fr 180px;background:#fff;border-radius:0;border-bottom:3px solid var(--dark);overflow:hidden;border:0.5px solid var(--border)}
+.rpt-logo{padding:10px 12px;border-right:.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--navy)}
+.rpt-logo-name{font-size:11px;font-weight:bold;color:#fff;line-height:1.4}
+.rpt-logo-city{font-size:9px;color:#7BA8C4;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.rpt-title-cell{display:flex;align-items:center;justify-content:center;padding:10px 14px;border-right:.5px solid var(--border);text-align:center}
+.rpt-title-cell h1{font-size:14px;font-weight:bold;color:var(--dark);line-height:1.4}
+.rpt-meta{display:flex;flex-direction:column;justify-content:center}
+.rpt-meta-row{display:flex;align-items:center;padding:5px 10px;border-bottom:.5px solid var(--border);font-size:10px}
+.rpt-meta-row:last-child{border-bottom:none}
+.rpt-meta-row .lbl{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.04em;width:66px;flex-shrink:0}
+.rpt-meta-row .val{font-weight:bold;color:var(--dark);font-size:10px}
+
+/* SECTION BARS */
+.sh{padding:5px 14px;font-size:9px;font-weight:bold;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:var(--dark);margin-top:2px;display:flex;align-items:center;gap:8px}
+.sh-mid{background:var(--steel)}
+.sh-l{background:var(--steel-l)}
+.sh-note{font-size:8px;font-weight:normal;opacity:.7;text-transform:none;letter-spacing:0}
+
+/* ZONE SNAPSHOT */
+.zsnap{background:#fff;padding:10px 12px;border:.5px solid var(--border)}
+.zsnap-inner{border-radius:0;overflow:hidden;border:.5px solid var(--border)}
+.zsnap-head{padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:.5px solid var(--border)}
+.zsnap-title{font-size:13px;font-weight:bold}
+.zsnap-sub{font-size:9px;margin-top:1px;opacity:.7}
+.zsnap-badge{font-size:10px;font-weight:bold;padding:3px 10px;border:.5px solid}
+.zsnap-body{padding:8px 12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#fff}
+.zf{display:flex;flex-direction:column;gap:2px}
+.zf-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.zf-val{font-size:11px;font-weight:bold;color:var(--dark);line-height:1.5}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;gap:8px;padding:10px 12px;background:#fff;border:.5px solid var(--border);border-top:none}
+.kpi-grid-4{grid-template-columns:repeat(4,1fr)}
+.kpi-grid-6{grid-template-columns:repeat(6,1fr)}
+.scard{padding:10px 12px;border:.5px solid var(--border);background:var(--slate)}
+.scard-num{font-size:22px;font-weight:bold;line-height:1;margin-bottom:3px}
+.scard-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.scard-sub{font-size:9px;color:var(--muted);margin-top:3px}
+.sc-tot{background:#EFF6FF;border-color:#BFDBFE}.sc-tot .scard-num{color:#1E40AF}
+.sc-pd{background:#FEF2F2;border-color:#FECACA}.sc-pd .scard-num{color:#991B1B}
+.sc-op{background:#FFFBEB;border-color:#FCD34D}.sc-op .scard-num{color:#92400E}
+.sc-cp{background:#F0FDF4;border-color:#86EFAC}.sc-cp .scard-num{color:#166534}
+.sc-late{background:#FEF2F2;border-color:#FECACA}.sc-late .scard-num{color:#7F1D1D}
+.sc-ontime{background:#F0FDF4;border-color:#86EFAC}.sc-ontime .scard-num{color:#14532D}
+.sc-rate{background:#EFF6FF;border-color:#BFDBFE}.sc-rate .scard-num{color:#1E3A8A}
+.sc-avg{background:#F5F3FF;border-color:#DDD6FE}.sc-avg .scard-num{color:#3B0764}
+
+/* TREND SUMMARY */
+.ai-banner{background:#fff;padding:10px 12px;border:.5px solid var(--border);border-top:none}
+.ai-inner{border:.5px solid var(--steel-mid);overflow:hidden}
+.ai-head{background:var(--steel-bg);padding:5px 12px;display:flex;align-items:center;gap:6px;border-bottom:.5px solid var(--steel-mid)}
+.ai-head-lbl{font-size:9px;font-weight:bold;color:var(--steel);text-transform:uppercase;letter-spacing:.05em}
+.ai-body{padding:10px 12px;background:#fff}
+.ai-stmt{font-size:11px;color:var(--dark);line-height:1.7;margin-bottom:8px}
+.ai-bullets{display:flex;flex-direction:column;gap:5px}
+.ai-bullet{display:flex;align-items:flex-start;gap:7px;font-size:10px;color:#374151;line-height:1.5}
+.ai-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+
+/* TREND CHART PANEL */
+.chart-panel{background:#fff;padding:12px 14px;border:.5px solid var(--border);border-top:none}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.chart-sub{font-size:9px;color:var(--muted);margin-bottom:8px}
+
+/* DONUT SECTION */
+.donut-section{background:#fff;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;border:.5px solid var(--border);border-top:none}
+.donut-panel{border:.5px solid var(--border);padding:10px 12px;background:var(--slate);min-width:0}
+.dp-title{font-size:10px;font-weight:bold;color:var(--dark);margin-bottom:1px}
+.dp-sub{font-size:9px;color:var(--muted);margin-bottom:10px}
+.donut-row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.donut-month-grid{display:grid;grid-template-columns:repeat(4,72px);gap:8px 10px;justify-content:start}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+.donut-month-lbl{font-size:9px;color:var(--muted);font-weight:bold;text-align:center}
+.dc{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.dc-num{position:absolute;font-size:11px;font-weight:bold;color:var(--dark)}
+.donut-legend{display:flex;flex-direction:column;gap:4px;flex:1;min-width:90px}
+.leg-row{display:flex;align-items:center;gap:5px;font-size:9px;color:#4A5568}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.leg-val{margin-left:auto;font-weight:bold;color:var(--dark);font-size:10px}
+.leg-divider{border:none;border-top:.5px solid var(--border);margin:3px 0}
+.leg-note{font-size:9px;color:var(--muted);line-height:1.5}
+.level-by-month{margin-top:9px;padding-top:8px;border-top:.5px solid var(--border)}
+.lbm-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.lbm-row{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.lbm-month{font-size:9px;color:var(--muted);width:50px;flex-shrink:0}
+.lv-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border:.5px solid;font-size:8px;font-weight:bold}
+.lv-crit{background:#FEF2F2;border-color:#FECACA;color:#991B1B}
+.lv-maj{background:#FFFBEB;border-color:#FCD34D;color:#92400E}
+.lv-min{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF}
+.lv-obs{background:#F3F4F6;border-color:#D1D5DB;color:#4B5563}
+.lv-none{font-size:9px;color:var(--muted);font-style:italic}
+
+/* NC TABLE */
+.nc-wrap{background:#fff;border:.5px solid var(--border);border-top:none}
+.nc-table{width:100%;border-collapse:collapse;font-size:10px}
+.nc-table th{background:var(--steel-bg);color:var(--steel);font-weight:bold;font-size:9px;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;text-align:left;border-bottom:1px solid var(--steel-mid)}
+.nc-table td{padding:5px 8px;border-bottom:.5px solid var(--border);vertical-align:middle}
+.nc-table tr:nth-child(even) td{background:var(--slate)}
+.nc-table tr:last-child td{border-bottom:none}
+.car-id{font-family:monospace;font-size:9px;font-weight:bold;color:var(--steel)}
+.zbadge{font-size:8px;font-weight:bold;padding:1px 5px}
+.z1b{background:#DBEAFE;color:#1E3A8A}.z2b{background:#DCFCE7;color:#14532D}
+.z3b{background:#FEF9C3;color:#713F12}.z4b{background:#FEF3C7;color:#78350F}.z5b{background:#F3E8FF;color:#4C1D95}
+.lvl-crit{background:#FEF2F2;color:#7F1D1D}.lvl-maj{background:#FFFBEB;color:#78350F}
+.lvl-min{background:#EFF6FF;color:#1E3A8A}.lvl-obs{background:#F3F4F6;color:#4B5563}
+.st-pill{font-size:8px;padding:1px 6px;font-weight:bold}
+.st-pd{background:#FEF2F2;color:#991B1B}
+.st-op{background:#FFFBEB;color:#92400E}
+.st-cp{background:#F0FDF4;color:#166534}
+.st-rm{background:#F3F4F6;color:#4B5563}
+.st-cl{background:#DCEEFB;color:#1B4F72}
+.warn-cell{color:#991B1B;font-weight:bold}
+
+/* CATEGORY PASS RATE */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px;background:#fff;border:.5px solid var(--border);border-top:none}
+.ccat{padding:10px;border:.5px solid var(--border)}
+.ccat-title{font-size:9px;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.ccat-row{display:flex;justify-content:space-between;margin-bottom:3px}
+.ccat-lbl{font-size:9px;color:var(--muted)}.ccat-val{font-size:10px;font-weight:bold}
+.ccat-pct{font-size:20px;font-weight:bold;text-align:center;margin-top:6px}
+.ccat-pct-lbl{font-size:9px;color:var(--muted);text-align:center}
+
+/* CLOSURE */
+.closure-wrap{background:#fff;border:.5px solid var(--border);border-top:none}
+.closure-table{width:100%;border-collapse:collapse;font-size:10px}
+.closure-table th{background:var(--steel-bg);color:var(--steel);font-weight:bold;font-size:9px;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;text-align:left;border-bottom:1px solid var(--steel-mid)}
+.closure-table td{padding:6px 8px;border-bottom:.5px solid var(--border);vertical-align:middle}
+.closure-table tr:nth-child(even) td{background:var(--slate)}
+.closure-table tr:last-child td{border-bottom:none}
+
+.confidential{font-size:8px;color:var(--muted);text-align:center;padding:4px 12px;border-top:.5px solid var(--border);background:var(--slate)}
+.rpt-footer{background:var(--steel-bg);padding:5px 12px;display:flex;justify-content:space-between;font-size:9px;color:var(--muted);border-top:.5px solid var(--border);flex-wrap:wrap;gap:3px}
+.loading{padding:40px;text-align:center;color:var(--muted);font-style:italic;font-size:12px}
+.no-data{padding:12px;text-align:center;color:var(--muted);font-style:italic;font-size:10px;background:#fff}
+
+@media print{
+  .left-panel{display:none!important}
+  body,html{overflow:visible;height:auto}
+  .layout{display:block;overflow:visible}
+  .right-panel{overflow:visible}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="lp-head">
+      <div class="lp-head-title">Facility Audit<br>Performance Report</div>
+      <div class="lp-head-sub">FRM-018-002 · CSC</div>
+    </div>
+    <div class="lp-section">
+      <div class="lp-lbl">Department</div>
+      <select class="lp-select" id="zoneSelect" onchange="selectedZone=this.value;render()">
+        <option value="all">All zones</option>
+        <option value="1">Zone 1 — Shipping</option>
+        <option value="2">Zone 2 — Metals</option>
+        <option value="3">Zone 3 — Plastics</option>
+        <option value="4">Zone 4 — Lithography</option>
+        <option value="5">Zone 5 — Misc</option>
+      </select>
+      <div class="lp-lbl">Period</div>
+      <div class="lp-date-row">
+        <div class="lp-date-col">
+          <span class="lp-date-mini-lbl">From</span>
+          <input type="month" class="lp-select lp-date-input" id="fromMonthInput" onchange="onPeriodChange()">
+        </div>
+        <div class="lp-date-col">
+          <span class="lp-date-mini-lbl">To</span>
+          <input type="month" class="lp-select lp-date-input" id="toMonthInput" onchange="onPeriodChange()">
+        </div>
+      </div>
+      <div class="lp-date-strip">
+        <strong id="lpDateVal">Loading...</strong>
+      </div>
+    </div>
+    <div class="lp-section">
+      <button class="btn-lp-print" onclick="window.print()">🖨 Print / Save PDF</button>
+    </div>
+    <div class="lp-kpi-summary" id="lpKPISummary">
+      <div style="font-size:9px;color:rgba(255,255,255,.25);font-style:italic">Loading summary...</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="page" id="pageRoot">
+      <div class="loading">Loading report data…</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var caRecords=[], auditRecords=[], docMeta={};
+var selectedFromYM=null, selectedToYM=null, selectedZone='all', loaded=0;
+var trendChartInstance=null, donutInstances=[];
+
+var ZONE_NAMES={'1':'Shipping & Receiving','2':'Metals','3':'Plastics','4':'Lithography','5':'Miscellaneous'};
+var ZONE_COLORS={
+  '1':{bg:'#DBEAFE',fg:'#1E3A8A',border:'#93C5FD'},
+  '2':{bg:'#DCFCE7',fg:'#14532D',border:'#86EFAC'},
+  '3':{bg:'#FEF9C3',fg:'#713F12',border:'#FDE047'},
+  '4':{bg:'#FEF3C7',fg:'#78350F',border:'#FCD34D'},
+  '5':{bg:'#F3E8FF',fg:'#4C1D95',border:'#D8B4FE'},
+};
+var CAT_COLORS={maint:'#4A7FA5',sanit:'#5DA37A',gmp:'#7F77DD',safety:'#D85A30'};
+var CAT_DASH={maint:[],sanit:[5,3],gmp:[2,2],safety:[8,4]};
+
+window.onload=function(){
+  var now=new Date();
+  var fromD=new Date(now.getFullYear(),now.getMonth()-2,1);
+  selectedFromYM=dateToYM(fromD);
+  selectedToYM=dateToYM(now);
+  var fi=document.getElementById('fromMonthInput'),ti=document.getElementById('toMonthInput');
+  if(fi)fi.value=ymToInputVal(selectedFromYM);
+  if(ti)ti.value=ymToInputVal(selectedToYM);
+  google.script.run.withSuccessHandler(function(m){docMeta=m||{};check();}).withFailureHandler(function(){check();}).getFADocMeta();
+  google.script.run.withSuccessHandler(function(r){caRecords=r||[];check();}).withFailureHandler(function(){caRecords=[];check();}).getCARecords();
+  google.script.run.withSuccessHandler(function(r){auditRecords=r||[];check();}).withFailureHandler(function(){auditRecords=[];check();}).getAuditRecords();
+};
+function check(){loaded++;if(loaded>=3)render();}
+function onPeriodChange(){
+  var fi=document.getElementById('fromMonthInput'),ti=document.getElementById('toMonthInput');
+  var fromYM=inputValToYM(fi.value),toYM=inputValToYM(ti.value);
+  if(!fromYM||!toYM)return;
+  if(fromYM>toYM){var t=fromYM;fromYM=toYM;toYM=t;}
+  selectedFromYM=fromYM;selectedToYM=toYM;
+  render();
+}
+
+// ── DATE HELPERS ──────────────────────────────────────────────
+function dateToYM(d){return d.getFullYear()+''+String(d.getMonth()+1).padStart(2,'0');}
+function ymToInputVal(ym){return ym?ym.substring(0,4)+'-'+ym.substring(4,6):'';}
+function inputValToYM(v){return v?v.replace('-',''):'';}
+function getDateRangeYM(fromYM,toYM){
+  var fy=parseInt(fromYM.substring(0,4),10),fm=parseInt(fromYM.substring(4,6),10)-1;
+  var ty=parseInt(toYM.substring(0,4),10),tm=parseInt(toYM.substring(4,6),10)-1;
+  var start=new Date(fy,fm,1);
+  var end=new Date(ty,tm+1,0,23,59,59,999);
+  return{start:start,end:end};
+}
+function fmtDateShort(d){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return M[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();}
+function parseDate(s){if(!s)return null;var d=new Date(s);return isNaN(d.getTime())?null:d;}
+function getMonthYM(d){if(!d)return '';var dt=typeof d==='string'?parseDate(d):d;if(!dt)return '';return dt.getFullYear()+''+String(dt.getMonth()+1).padStart(2,'0');}
+function getMonthsInRangeYM(fromYM,toYM){
+  var months=[];
+  var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var fy=parseInt(fromYM.substring(0,4),10),fm=parseInt(fromYM.substring(4,6),10)-1;
+  var ty=parseInt(toYM.substring(0,4),10),tm=parseInt(toYM.substring(4,6),10)-1;
+  var cur=new Date(fy,fm,1),end=new Date(ty,tm,1),guard=0;
+  while(cur<=end&&guard<240){
+    var ym=cur.getFullYear()+''+String(cur.getMonth()+1).padStart(2,'0');
+    months.push({ym:ym,label:M[cur.getMonth()]+' '+cur.getFullYear(),short:M[cur.getMonth()]});
+    cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);
+    guard++;
+  }
+  return months;
+}
+function daysBetween(d1,d2){if(!d1||!d2)return null;return Math.round((d2-d1)/(1000*60*60*24));}
+function today(){var d=new Date();return String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+'/'+d.getFullYear();}
+function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── FILTER ────────────────────────────────────────────────────
+function filterCA(zone,range){
+  return caRecords.filter(function(r){
+    if(zone!=='all'&&String(r.zone).trim()!==zone)return false;
+    var d=parseDate(r.ncDate);return d&&d>=range.start&&d<=range.end;
+  });
+}
+function filterAudit(zone,range){
+  return auditRecords.filter(function(r){
+    if(zone!=='all'&&String(r.zone).trim()!==zone)return false;
+    var d=parseDate(r.auditDate);return d&&d>=range.start&&d<=range.end;
+  });
+}
+
+// ── STATUS HELPERS ────────────────────────────────────────────
+function isPastDue(r){
+  var s=(r.status||'').toLowerCase();
+  if(s.indexOf('complete')!==-1||s.indexOf('removed')!==-1||s.indexOf('closed')!==-1)return false;
+  var d=parseDate(r.dueDate);return d&&d<new Date();
+}
+function statusClass(r){
+  var s=(r.status||'').toLowerCase();
+  if(s.indexOf('past due')!==-1||isPastDue(r))return 'st-pd';
+  if(s.indexOf('closed')!==-1)return 'st-cl';
+  if(s.indexOf('complete')!==-1)return 'st-cp';
+  if(s.indexOf('removed')!==-1)return 'st-rm';
+  return 'st-op';
+}
+function statusLabel(r){
+  var s=(r.status||'').toLowerCase();
+  if(s.indexOf('past due')!==-1||isPastDue(r))return 'Past Due';
+  if(s.indexOf('closed')!==-1)return 'Closed';
+  if(s.indexOf('complete')!==-1)return 'Complete';
+  if(s.indexOf('removed')!==-1)return 'Removed';
+  return 'Open';
+}
+function levelClass(l){
+  var v=(l||'').toLowerCase();
+  if(v==='critical')return 'lvl-crit';if(v==='major')return 'lvl-maj';
+  if(v==='minor')return 'lvl-min';return 'lvl-obs';
+}
+
+// ── CLOSURE METRICS ───────────────────────────────────────────
+function calcClosure(caF){
+  var total=caF.length,complete=0,onTime=0,late=0,stillOpen=0,pastDue=0,days=[];
+  var now=new Date();
+  caF.forEach(function(r){
+    var st=(r.status||'').toLowerCase();
+    var due=parseDate(r.dueDate),comp=parseDate(r.completionDate);
+    var isComp=st.indexOf('complete')!==-1||st.indexOf('closed')!==-1;
+    if(isComp){
+      complete++;
+      if(comp&&parseDate(r.ncDate)){var d=daysBetween(parseDate(r.ncDate),comp);if(d!==null)days.push(d);}
+      if(comp&&due){if(comp<=due)onTime++;else late++;}else onTime++;
+    } else {
+      if(due&&due<now)pastDue++;else stillOpen++;
+    }
+  });
+  var avg=days.length>0?Math.round(days.reduce(function(a,b){return a+b;},0)/days.length):null;
+  return{total:total,complete:complete,onTime:onTime,late:late,stillOpen:stillOpen,
+         pastDue:pastDue,avgDays:avg,
+         compRate:total>0?Math.round((complete/total)*100):0,
+         onTimeRate:complete>0?Math.round((onTime/complete)*100):0};
+}
+
+// ── DONUT SVG ─────────────────────────────────────────────────
+function donutSVG(segs,total,size){
+  size=size||72;var r=size*.36,cx=size/2,cy=size/2,circ=2*Math.PI*r,sw=size*.167;
+  if(!total)return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#E5E7EB" stroke-width="'+sw+'"/></svg>';
+  var offset=0,arcs='';
+  segs.forEach(function(s){
+    if(!s.value)return;
+    var dash=(s.value/total)*circ,gap=circ-dash;
+    arcs+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+s.color+'" stroke-width="'+sw+'" stroke-dasharray="'+dash.toFixed(1)+' '+gap.toFixed(1)+'" stroke-dashoffset="'+(-offset).toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')" />';
+    offset+=dash;
+  });
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#E5E7EB" stroke-width="'+sw+'"/>'+arcs+'</svg>';
+}
+
+// ── TREND SUMMARY TEXT ────────────────────────────────────────
+function buildSummary(caF,auF,zone,mths){
+  var zname=zone==='all'?'all zones':(ZONE_NAMES[zone]||'Zone '+zone);
+  var cl=calcClosure(caF);
+  var maintYes=auF.reduce(function(s,r){return s+(Number(r.maintYes)||0);},0);
+  var sanitYes=auF.reduce(function(s,r){return s+(Number(r.sanitYes)||0);},0);
+  var gmpYes=auF.reduce(function(s,r){return s+(Number(r.gmpYes)||0);},0);
+  var safetyYes=auF.reduce(function(s,r){return s+(Number(r.safetyYes)||0);},0);
+  var catMax=Math.max(maintYes,sanitYes,gmpYes,safetyYes);
+  var worstCat=catMax===0?null:catMax===maintYes?'Maintenance':catMax===sanitYes?'Sanitation':catMax===gmpYes?'GMP':'Safety';
+  var mthCounts=mths.map(function(m){return caF.filter(function(r){return getMonthYM(r.ncDate)===m.ym;}).length;});
+  var trend='stable';
+  if(mthCounts.length>=2){var last=mthCounts[mthCounts.length-1],prev=mthCounts[mthCounts.length-2];if(last<prev)trend='improving';else if(last>prev)trend='worsening';}
+  var unassigned=caF.filter(function(r){return isPastDue(r)&&(!r.responsiblePerson||r.responsiblePerson.trim()==='');});
+  var descMonths={};
+  caF.forEach(function(r){var k=(r.description||'').trim().toLowerCase().substring(0,60);var ym=getMonthYM(r.ncDate);if(!descMonths[k])descMonths[k]=[];if(descMonths[k].indexOf(ym)===-1)descMonths[k].push(ym);});
+  var repeats=Object.keys(descMonths).filter(function(k){return descMonths[k].length>1;});
+  var periodLabel=mths.length<=1?(mths[0]?mths[0].label:''):mths[0].label+' – '+mths[mths.length-1].label;
+  var stmt='Over the period of <strong>'+esc(periodLabel)+'</strong>, <strong>'+esc(zname)+'</strong> completed <strong>'+auF.length+' audit'+(auF.length!==1?'s':'')+'</strong> generating <strong>'+caF.length+' CA finding'+(caF.length!==1?'s':'')+'</strong>. Completion rate is <strong>'+cl.compRate+'%</strong>'+(cl.complete>0?' with <strong>'+cl.onTimeRate+'%</strong> closed on time.':'.');
+  if(worstCat)stmt+=' <strong>'+worstCat+' is the primary area of concern.</strong>';
+  var bullets=[];
+  if(repeats.length>0)bullets.push({color:'#991B1B',text:'<strong>Repeat finding:</strong> A finding has appeared in '+descMonths[repeats[0]].length+' consecutive audit cycles — corrective action may not be sustained.'});
+  if(unassigned.length>0)bullets.push({color:'#92400E',text:'<strong>Unassigned past due:</strong> '+unassigned.length+' past due finding'+(unassigned.length>1?'s have':' has')+' no responsible person assigned. Immediate action required.'});
+  if(cl.late>0)bullets.push({color:'#991B1B',text:'<strong>Late closures:</strong> '+cl.late+' finding'+(cl.late>1?'s were':' was')+' closed after the due date.'+(cl.avgDays!==null?' Average days to close: '+cl.avgDays+'.':"")});
+  if(trend==='improving')bullets.push({color:'#166534',text:'<strong>Improving trend:</strong> Finding count decreased in the most recent audit cycle.'});
+  else if(trend==='worsening')bullets.push({color:'#991B1B',text:'<strong>Worsening trend:</strong> Finding count increased in the most recent audit cycle.'});
+  var safeZero=[];
+  if(maintYes===0&&auF.length>0)safeZero.push('Maintenance');
+  if(sanitYes===0&&auF.length>0)safeZero.push('Sanitation');
+  if(gmpYes===0&&auF.length>0)safeZero.push('GMP');
+  if(safetyYes===0&&auF.length>0)safeZero.push('Safety');
+  if(safeZero.length>0)bullets.push({color:'#166534',text:'<strong>Zero findings:</strong> '+safeZero.join(', ')+' had no findings across all audits this period.'});
+  return{stmt:stmt,bullets:bullets};
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────
+function render(){
+  // destroy existing charts
+  if(trendChartInstance){trendChartInstance.destroy();trendChartInstance=null;}
+  donutInstances.forEach(function(c){c.destroy();});donutInstances=[];
+
+  var range=getDateRangeYM(selectedFromYM,selectedToYM);
+  var months=getMonthsInRangeYM(selectedFromYM,selectedToYM);
+  var caF=filterCA(selectedZone,range);
+  var auF=filterAudit(selectedZone,range);
+  var cl=calcClosure(caF);
+
+  // Category totals from Audit Log
+  function sum(f){return auF.reduce(function(s,r){return s+(Number(r[f])||0);},0);}
+  var mY=sum('maintYes'),mN=sum('maintNo'),mNA=sum('maintNA');
+  var sY=sum('sanitYes'),sN=sum('sanitNo'),sNA=sum('sanitNA');
+  var gY=sum('gmpYes'),gN=sum('gmpNo'),gNA=sum('gmpNA');
+  var sfY=sum('safetyYes'),sfN=sum('safetyNo'),sfNA=sum('safetyNA');
+  var totalItemYes=mY+sY+gY+sfY;
+
+  // Level counts
+  var lvls={Critical:0,Major:0,Minor:0,Observation:0};
+  caF.forEach(function(r){var l=r.ncLevel||'Minor';if(lvls[l]!==undefined)lvls[l]++;else lvls.Minor++;});
+
+  // Per-month data
+  var monthDonuts=months.map(function(m){
+    var mAudit=auF.filter(function(r){return getMonthYM(r.auditDate)===m.ym;});
+    var mCA=caF.filter(function(r){return getMonthYM(r.ncDate)===m.ym;});
+    var mmY=mAudit.reduce(function(s,r){return s+(Number(r.maintYes)||0);},0);
+    var msY=mAudit.reduce(function(s,r){return s+(Number(r.sanitYes)||0);},0);
+    var mgY=mAudit.reduce(function(s,r){return s+(Number(r.gmpYes)||0);},0);
+    var msfY=mAudit.reduce(function(s,r){return s+(Number(r.safetyYes)||0);},0);
+    var mmN=mAudit.reduce(function(s,r){return s+(Number(r.maintNo)||0);},0);
+    var msN=mAudit.reduce(function(s,r){return s+(Number(r.sanitNo)||0);},0);
+    var mgN=mAudit.reduce(function(s,r){return s+(Number(r.gmpNo)||0);},0);
+    var msfN=mAudit.reduce(function(s,r){return s+(Number(r.safetyNo)||0);},0);
+    // Pass rate per category
+    function pr(yes,no){var t=yes+no;return t>0?Math.round((no/t)*100):100;}
+    var mLvls={Critical:0,Major:0,Minor:0,Observation:0};
+    mCA.forEach(function(r){var l=r.ncLevel||'Minor';if(mLvls[l]!==undefined)mLvls[l]++;else mLvls.Minor++;});
+    return{
+      month:m,total:mmY+msY+mgY+msfY,findings:mCA.length,hasAudit:mAudit.length>0,
+      mMaint:mmY,mSanit:msY,mGmp:mgY,mSafety:msfY,lvls:mLvls,
+      prMaint:pr(mmY,mmN),prSanit:pr(msY,msN),prGmp:pr(mgY,mgN),prSafety:pr(msfY,msfN),
+    };
+  });
+
+  var auditDates=[...new Set(auF.map(function(r){return r.auditDate;}))].filter(Boolean).sort();
+  var coordinators=[...new Set(auF.map(function(r){return r.coordinator;}))].filter(Boolean);
+  var auditors=[...new Set(auF.map(function(r){return r.auditor;}))].filter(Boolean);
+  var summary=buildSummary(caF,auF,selectedZone,months);
+  var zoneLabel=selectedZone==='all'?'All Zones':'Zone '+selectedZone+' — '+(ZONE_NAMES[selectedZone]||'');
+
+  // ── BUILD HTML ───────────────────────────────────────────────
+  var html=
+
+  // HEADER
+  '<div class="rpt-header">'
+  +'<div class="rpt-logo"><div class="rpt-logo-name">Container<br>Supply Co.</div><div class="rpt-logo-city">Garden Grove, CA</div></div>'
+  +'<div class="rpt-title-cell"><h1>Facility Audit<br>Performance Report</h1></div>'
+  +'<div class="rpt-meta">'
+  +'<div class="rpt-meta-row"><span class="lbl">Audit form</span><span class="val">FRM-018-002</span></div>'
+  +'<div class="rpt-meta-row"><span class="lbl">CA form</span><span class="val">FRM-018-004</span></div>'
+  +'<div class="rpt-meta-row"><span class="lbl">Zone</span><span class="val">'+esc(zoneLabel)+'</span></div>'
+  +'<div class="rpt-meta-row"><span class="lbl">Generated</span><span class="val">'+today()+'</span></div>'
+  +'</div></div>'
+
+  // ZONE SNAPSHOT
+  +'<div class="sh">'+esc(zoneLabel)+' — audit snapshot</div>'
+  +'<div class="zsnap">'+(selectedZone==='all'?renderAllZoneSnapshot(auditRecords,caRecords,range):renderZoneSnapshot(selectedZone,auF,caF,auditDates,coordinators,auditors,cl))+'</div>'
+
+  // KPI SECTION 1
+  +'<div class="sh sh-mid">KPI by inspection item <span class="sh-note">Yes = at least one NC found on that item (Audit Log)</span></div>'
+  +'<div class="kpi-grid kpi-grid-4">'
+  +'<div class="scard sc-tot"><div class="scard-num">'+totalItemYes+'</div><div class="scard-lbl">Items with NC</div><div class="scard-sub">out of '+(auF.length*15)+' items checked</div></div>'
+  +'<div class="scard sc-pd"><div class="scard-num">'+mY+'</div><div class="scard-lbl">Maintenance NCs</div><div class="scard-sub">items flagged Yes</div></div>'
+  +'<div class="scard sc-op"><div class="scard-num">'+(sY+gY)+'</div><div class="scard-lbl">Sanitation + GMP NCs</div><div class="scard-sub">items flagged Yes</div></div>'
+  +'<div class="scard sc-cp"><div class="scard-num">'+sfY+'</div><div class="scard-lbl">Safety NCs</div><div class="scard-sub">items flagged Yes</div></div>'
+  +'</div>'
+
+  // KPI SECTION 2
+  +'<div class="sh sh-dark">KPI by CA findings <span class="sh-note">Individual CA records — one item can have multiple findings</span></div>'
+  +'<div class="kpi-grid kpi-grid-4">'
+  +'<div class="scard sc-tot"><div class="scard-num">'+caF.length+'</div><div class="scard-lbl">Total CA findings</div><div class="scard-sub">individual records</div></div>'
+  +'<div class="scard sc-pd"><div class="scard-num">'+cl.pastDue+'</div><div class="scard-lbl">Past due</div><div class="scard-sub">no completion date</div></div>'
+  +'<div class="scard sc-op"><div class="scard-num">'+cl.stillOpen+'</div><div class="scard-lbl">Open / in progress</div><div class="scard-sub">within due date</div></div>'
+  +'<div class="scard sc-cp"><div class="scard-num">'+cl.complete+'</div><div class="scard-lbl">Complete</div><div class="scard-sub">'+cl.compRate+'% completion rate</div></div>'
+  +'</div>'
+
+  // TREND SUMMARY
+  +'<div class="sh">Trend analysis — '+esc(zoneLabel)+'</div>'
+  +'<div class="ai-banner"><div class="ai-inner">'
+  +'<div class="ai-head"><span class="ai-head-lbl">Period summary — generated from audit data</span></div>'
+  +'<div class="ai-body"><p class="ai-stmt">'+summary.stmt+'</p>'
+  +(summary.bullets.length?'<div class="ai-bullets">'+summary.bullets.map(function(b){
+    return '<div class="ai-bullet"><div class="ai-dot" style="background:'+b.color+'"></div><span>'+b.text+'</span></div>';
+  }).join('')+'</div>':'')
+  +'</div></div></div>'
+
+  // PASS RATE TREND LINE CHART
+  +'<div class="sh sh-mid">Pass rate trend — '+esc(zoneLabel)+', % per category per month</div>'
+  +'<div class="chart-panel">'
+  +'<div class="chart-sub">Y axis = pass rate % (100% = no NC found that month). Direction of lines shows whether each category is improving or declining.</div>'
+  +'<div class="chart-legend">'
+  +'<div class="leg-item"><div class="leg-sq" style="background:#4A7FA5"></div>Maintenance</div>'
+  +'<div class="leg-item"><div class="leg-sq" style="background:#5DA37A"></div>Sanitation</div>'
+  +'<div class="leg-item"><div class="leg-sq" style="background:#7F77DD"></div>GMP</div>'
+  +'<div class="leg-item"><div class="leg-sq" style="background:#D85A30"></div>Safety</div>'
+  +'</div>'
+  +'<div style="position:relative;width:100%;height:220px"><canvas id="trendChart" role="img" aria-label="Line chart showing monthly pass rate % per category">Pass rate trend by category.</canvas></div>'
+  +'</div>'
+
+  // DONUT CHARTS
+  +'<div class="sh sh-l">Current period breakdown — by category &amp; NC level</div>'
+  +'<div class="donut-section">'
+  +renderCategoryDonuts(monthDonuts,mY,sY,gY,sfY)
+  +renderLevelDonut(lvls,monthDonuts)
+  +'</div>'
+
+  // NC TABLE
+  +'<div class="sh sh-mid">Nonconformance detail — '+esc(zoneLabel)+', all findings this period</div>'
+  +renderNCTable(caF)
+
+  // CATEGORY PASS RATE
+  +'<div class="sh">Category pass rate — by inspection item</div>'
+  +renderCatCards(mY,mN,mNA,sY,sN,sNA,gY,gN,gNA,sfY,sfN,sfNA)
+
+  // CLOSURE SECTION
+  +'<div class="sh sh-mid">Closure &amp; timeliness — by CA finding</div>'
+  +renderClosureSection(caF,cl)
+
+  +'<div class="confidential">This report is confidential. Printed copies are uncontrolled.</div>'
+  +'<div class="rpt-footer">'
+  +'<span>FRM-018-004 · FRM-018-002 · Facility Audit Performance Report</span>'
+  +'<span>Container Supply Co. — Garden Grove, CA</span>'
+  +'<span>Generated: '+today()+'</span>'
+  +'</div>';
+
+  document.getElementById('pageRoot').innerHTML=html;
+
+  // Sync left panel selects
+  var zs=document.getElementById('zoneSelect');var fi=document.getElementById('fromMonthInput');var ti=document.getElementById('toMonthInput');
+  if(zs)zs.value=selectedZone;
+  if(fi)fi.value=ymToInputVal(selectedFromYM);
+  if(ti)ti.value=ymToInputVal(selectedToYM);
+
+  // Update date strip
+  var strip=document.getElementById('lpDateVal');
+  if(strip)strip.textContent=fmtDateShort(range.start)+' → '+fmtDateShort(range.end);
+
+  // Update left panel KPI summary
+  var kpiDiv=document.getElementById('lpKPISummary');
+  if(kpiDiv){
+    kpiDiv.innerHTML='<div class="lp-divider"></div>'
+      +'<div class="lp-kpi-item"><div class="lp-kpi-val">'+auF.length+'</div><div class="lp-kpi-lbl">Audits</div><div class="lp-kpi-sub">this period</div></div>'
+      +'<div class="lp-kpi-item"><div class="lp-kpi-val" style="color:#FAC775">'+caF.length+'</div><div class="lp-kpi-lbl">CA findings</div><div class="lp-kpi-sub">individual records</div></div>'
+      +'<div class="lp-kpi-item"><div class="lp-kpi-val" style="color:#F09595">'+cl.pastDue+'</div><div class="lp-kpi-lbl">Past due</div><div class="lp-kpi-sub">needs attention</div></div>'
+      +'<div class="lp-kpi-item"><div class="lp-kpi-val" style="color:#C0DD97">'+cl.compRate+'%</div><div class="lp-kpi-lbl">Completion rate</div><div class="lp-kpi-sub">'+cl.complete+' of '+cl.total+' closed</div></div>'
+      +'<div class="lp-divider"></div>';
+  }
+
+  // Build trend line chart
+  setTimeout(function(){
+    var canvas=document.getElementById('trendChart');
+    if(!canvas)return;
+    trendChartInstance=new Chart(canvas,{
+      type:'line',
+      data:{
+        labels:months.map(function(m){return m.label;}),
+        datasets:[
+          {label:'Maintenance',data:monthDonuts.map(function(m){return m.hasAudit?m.prMaint:null;}),borderColor:'#4A7FA5',backgroundColor:'rgba(74,127,165,0.05)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#4A7FA5',borderDash:[],tension:0.3,fill:false,spanGaps:false},
+          {label:'Sanitation',data:monthDonuts.map(function(m){return m.hasAudit?m.prSanit:null;}),borderColor:'#5DA37A',backgroundColor:'rgba(93,163,122,0.05)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#5DA37A',borderDash:[5,3],tension:0.3,fill:false,spanGaps:false},
+          {label:'GMP',data:monthDonuts.map(function(m){return m.hasAudit?m.prGmp:null;}),borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.05)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#7F77DD',borderDash:[2,2],tension:0.3,fill:false,spanGaps:false},
+          {label:'Safety',data:monthDonuts.map(function(m){return m.hasAudit?m.prSafety:null;}),borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,0.05)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#D85A30',borderDash:[8,4],tension:0.3,fill:false,spanGaps:false}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:function(c){return c.dataset.label+': '+c.parsed.y+'%';}}}},
+        scales:{
+          y:{min:0,max:100,ticks:{callback:function(v){return v+'%';},font:{size:10},color:'#9CA3AF'},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}},
+          x:{ticks:{font:{size:10},color:'#9CA3AF',autoSkip:false,maxRotation:45},grid:{display:false},border:{display:false}}
+        }
+      }
+    });
+
+    // Build donut charts
+    months.forEach(function(m,i){
+      var md=monthDonuts[i];
+      var c=document.getElementById('donut-cat-'+i);
+      if(c&&md.hasAudit){
+        donutInstances.push(new Chart(c,{type:'doughnut',data:{datasets:[{data:[md.mMaint,md.mSanit,md.mGmp,md.mSafety],backgroundColor:['#4A7FA5','#5DA37A','#7F77DD','#D85A30'],borderWidth:0}]},options:{responsive:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{display:false}}}}));
+      }
+    });
+    var lc=document.getElementById('donut-level');
+    if(lc){
+      donutInstances.push(new Chart(lc,{type:'doughnut',data:{datasets:[{data:[lvls.Critical,lvls.Major,lvls.Minor,lvls.Observation],backgroundColor:['#991B1B','#D97706','#4A7FA5','#9CA3AF'],borderWidth:0}]},options:{responsive:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{display:false}}}}));
+    }
+  },50);
+}
+
+// ── ZONE SNAPSHOTS ────────────────────────────────────────────
+function renderZoneSnapshot(zone,auF,caF,dates,coords,auditors,cl){
+  var zc=ZONE_COLORS[zone]||{bg:'#E8EEF4',fg:'#1E3A52',border:'#B8CDD9'};
+  var zn=ZONE_NAMES[zone]||'Zone '+zone;
+  return '<div class="zsnap-inner">'
+  +'<div class="zsnap-head" style="background:'+zc.bg+';border-bottom-color:'+zc.border+'">'
+  +'<div><div class="zsnap-title" style="color:'+zc.fg+'">Zone '+esc(zone)+' — '+esc(zn)+'</div>'
+  +'<div class="zsnap-sub" style="color:'+zc.fg+'">Audit period summary</div></div>'
+  +'<span class="zsnap-badge" style="background:'+zc.bg+';border-color:'+zc.border+';color:'+zc.fg+'">'+auF.length+' audit'+(auF.length!==1?'s':'')+' this period</span>'
+  +'</div>'
+  +'<div class="zsnap-body">'
+  +'<div class="zf"><span class="zf-lbl">Audit dates</span>'+(dates.length?dates.map(function(d){return '<span class="zf-val">'+esc(d)+'</span>';}).join(''):'<span class="zf-val" style="color:var(--muted)">None</span>')+'</div>'
+  +'<div class="zf"><span class="zf-lbl">Coordinator</span><span class="zf-val">'+(coords.length?esc(coords.join(', ')):'—')+'</span>'
+  +'<span class="zf-lbl" style="margin-top:5px">Zone designee</span><span class="zf-val">'+(auditors.length?esc(auditors.join(', ')):'—')+'</span></div>'
+  +'<div class="zf"><span class="zf-lbl">Items checked</span><span class="zf-val">'+( auF.length*15)+'</span>'
+  +'<span class="zf-lbl" style="margin-top:5px">CA findings</span><span class="zf-val" style="color:'+(caF.length>0?'#991B1B':'#166534')+'">'+caF.length+'</span></div>'
+  +'<div class="zf"><span class="zf-lbl">Open</span><span class="zf-val" style="color:#92400E">'+cl.stillOpen+'</span>'
+  +'<span class="zf-lbl" style="margin-top:4px">Past due</span><span class="zf-val" style="color:#991B1B">'+cl.pastDue+'</span>'
+  +'<span class="zf-lbl" style="margin-top:4px">Complete</span><span class="zf-val" style="color:#166534">'+cl.complete+'</span></div>'
+  +'</div></div>';
+}
+
+function renderAllZoneSnapshot(allAudit,allCA,range){
+  var html='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">';
+  ['1','2','3','4','5'].forEach(function(z){
+    var zc=ZONE_COLORS[z];
+    var auZ=allAudit.filter(function(r){var d=parseDate(r.auditDate);return String(r.zone).trim()===z&&d&&d>=range.start&&d<=range.end;});
+    var caZ=allCA.filter(function(r){var d=parseDate(r.ncDate);return String(r.zone).trim()===z&&d&&d>=range.start&&d<=range.end;});
+    var cl=calcClosure(caZ);
+    html+='<div style="border:.5px solid '+zc.border+';overflow:hidden">'
+    +'<div style="background:'+zc.bg+';padding:5px 8px;border-bottom:.5px solid '+zc.border+'">'
+    +'<div style="font-size:10px;font-weight:bold;color:'+zc.fg+'">Zone '+z+'</div>'
+    +'<div style="font-size:9px;color:'+zc.fg+';opacity:.7">'+(ZONE_NAMES[z]||'')+'</div>'
+    +'</div>'
+    +'<div style="padding:6px 8px;background:#fff;font-size:10px">'
+    +'<div style="color:var(--muted);font-size:9px">Audits</div><div style="font-weight:bold">'+auZ.length+'</div>'
+    +'<div style="color:var(--muted);font-size:9px;margin-top:3px">CA findings</div>'
+    +'<div style="font-weight:bold;color:'+(caZ.length>0?'#991B1B':'#166534')+'">'+caZ.length+'</div>'
+    +'<div style="color:var(--muted);font-size:9px;margin-top:3px">Complete</div>'
+    +'<div style="font-weight:bold;color:#166534">'+cl.compRate+'%</div>'
+    +'</div></div>';
+  });
+  return html+'</div>';
+}
+
+// ── DONUT RENDERERS ───────────────────────────────────────────
+function renderCategoryDonuts(monthDonuts,mY,sY,gY,sfY){
+  var totalAll=mY+sY+gY+sfY;
+  var donutsHtml=monthDonuts.map(function(m,i){
+    return '<div class="donut-wrap">'
+    +'<div class="dc" style="width:72px;height:72px">'
+    +(m.hasAudit?'<canvas id="donut-cat-'+i+'" width="72" height="72" role="img" aria-label="'+esc(m.month.label)+' category breakdown">Category breakdown for '+esc(m.month.label)+'</canvas>':'<svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="26" fill="none" stroke="#E5E7EB" stroke-width="12"/><text x="36" y="40" text-anchor="middle" font-size="10" fill="#9CA3AF">—</text></svg>')
+    +'<span class="dc-num">'+(m.hasAudit?m.total:'')+'</span>'
+    +'</div>'
+    +'<span class="donut-month-lbl">'+esc(m.month.short)+'</span>'
+    +'</div>';
+  }).join('');
+  return '<div class="donut-panel">'
+  +'<div class="dp-title">Findings by category per month</div>'
+  +'<div class="dp-sub">Each donut = one audit month (by inspection item Yes count)</div>'
+  +'<div class="donut-row"><div class="donut-month-grid">'+donutsHtml+'</div>'
+  +'<div class="donut-legend">'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#4A7FA5"></div>Maintenance<span class="leg-val">'+mY+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#5DA37A"></div>Sanitation<span class="leg-val">'+sY+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#7F77DD"></div>GMP<span class="leg-val">'+gY+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#D85A30"></div>Safety<span class="leg-val">'+sfY+'</span></div>'
+  +'<hr class="leg-divider"><div class="leg-note">Total: <strong>'+totalAll+'</strong> items with NC</div>'
+  +'</div></div></div>';
+}
+
+function renderLevelDonut(lvls,monthDonuts){
+  var total=lvls.Critical+lvls.Major+lvls.Minor+lvls.Observation;
+  var byMonthHtml=monthDonuts.map(function(m){
+    var chips='';
+    if(!m.hasAudit){chips='<span class="lv-none">No audit</span>';}
+    else{
+      if(m.lvls.Critical)chips+='<span class="lv-chip lv-crit">'+m.lvls.Critical+' Crit</span>';
+      if(m.lvls.Major)chips+='<span class="lv-chip lv-maj">'+m.lvls.Major+' Maj</span>';
+      if(m.lvls.Minor)chips+='<span class="lv-chip lv-min">'+m.lvls.Minor+' Min</span>';
+      if(m.lvls.Observation)chips+='<span class="lv-chip lv-obs">'+m.lvls.Observation+' Obs</span>';
+      if(!chips)chips='<span class="lv-chip" style="background:#F0FDF4;border-color:#86EFAC;color:#166534">0 findings</span>';
+    }
+    return '<div class="lbm-row"><span class="lbm-month">'+esc(m.month.short)+'</span>'+chips+'</div>';
+  }).join('');
+  return '<div class="donut-panel">'
+  +'<div class="dp-title">CA findings by NC level — full period</div>'
+  +'<div class="dp-sub">Overall severity mix and per-month breakdown (individual CA records)</div>'
+  +'<div class="donut-row">'
+  +'<div class="donut-wrap"><div class="dc" style="width:72px;height:72px"><canvas id="donut-level" width="72" height="72" role="img" aria-label="NC level breakdown">NC level breakdown</canvas><span class="dc-num">'+total+'</span></div>'
+  +'<span class="donut-month-lbl">All months</span></div>'
+  +'<div class="donut-legend">'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#991B1B"></div>Critical<span class="leg-val" style="color:#991B1B">'+lvls.Critical+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#D97706"></div>Major<span class="leg-val" style="color:#92400E">'+lvls.Major+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#4A7FA5"></div>Minor<span class="leg-val">'+lvls.Minor+'</span></div>'
+  +'<div class="leg-row"><div class="leg-dot" style="background:#9CA3AF"></div>Observation<span class="leg-val">'+lvls.Observation+'</span></div>'
+  +'</div></div>'
+  +'<div class="level-by-month"><div class="lbm-lbl">By month</div>'+byMonthHtml+'</div>'
+  +'</div>';
+}
+
+// ── NC TABLE ──────────────────────────────────────────────────
+function renderNCTable(records){
+  if(!records.length)return '<div class="no-data nc-wrap">No findings in this period for the selected zone.</div>';
+  var rows=records.slice().sort(function(a,b){var ap=isPastDue(a)?0:1,bp=isPastDue(b)?0:1;if(ap!==bp)return ap-bp;return (parseDate(b.ncDate)||0)-(parseDate(a.ncDate)||0);});
+  var html='<div class="nc-wrap"><table class="nc-table"><thead><tr>'
+  +'<th>CAR ID</th><th>Date</th><th>Zone</th><th>Level</th><th>Inspection item</th><th>Description</th><th>Responsible</th><th>Due</th><th>Status</th>'
+  +'</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var pd=isPastDue(r);
+    var noA=pd&&(!r.responsiblePerson||r.responsiblePerson.trim()==='');
+    var zb='z'+String(r.zone).trim()+'b';
+    html+='<tr>'
+    +'<td><span class="car-id">'+esc(r.carId)+'</span></td>'
+    +'<td>'+esc(r.ncDate)+'</td>'
+    +'<td><span class="zbadge '+zb+'">Z'+esc(r.zone)+'</span></td>'
+    +'<td><span class="zbadge '+levelClass(r.ncLevel)+'">'+esc(r.ncLevel||'Minor')+'</span></td>'
+    +'<td>'+esc(r.inspectionItem||'—')+'</td>'
+    +'<td>'+esc(r.description||'—')+'</td>'
+    +'<td class="'+(noA?'warn-cell':'')+'">'+esc(r.responsiblePerson||(noA?'Unassigned ⚠':'—'))+'</td>'
+    +'<td class="'+(pd?'warn-cell':'')+'">'+esc(r.dueDate||'—')+'</td>'
+    +'<td><span class="st-pill '+statusClass(r)+'">'+statusLabel(r)+'</span></td>'
+    +'</tr>';
+  });
+  return html+'</tbody></table></div>';
+}
+
+// ── CATEGORY PASS RATE CARDS ──────────────────────────────────
+function renderCatCards(mY,mN,mNA,sY,sN,sNA,gY,gN,gNA,sfY,sfN,sfNA){
+  function card(bg,bd,tc,title,yes,no,na){
+    var checked=yes+no,pct=checked>0?Math.round((no/checked)*100):100;
+    var pc=pct>=90?'#166534':pct>=70?'#92400E':'#991B1B';
+    return '<div class="ccat" style="background:'+bg+';border-color:'+bd+'">'
+    +'<div class="ccat-title" style="color:'+tc+'">'+title+'</div>'
+    +'<div class="ccat-row"><span class="ccat-lbl">Items with NC</span><span class="ccat-val" style="color:#991B1B">'+yes+'</span></div>'
+    +'<div class="ccat-row"><span class="ccat-lbl">Passed</span><span class="ccat-val" style="color:#166534">'+no+'</span></div>'
+    +'<div class="ccat-row"><span class="ccat-lbl">N/A</span><span class="ccat-val" style="color:var(--muted)">'+na+'</span></div>'
+    +'<div class="ccat-pct" style="color:'+pc+'">'+pct+'%</div>'
+    +'<div class="ccat-pct-lbl">pass rate</div>'
+    +'</div>';
+  }
+  return '<div class="cat-grid">'
+  +card('#EFF6FF','#BFDBFE','#1E40AF','Maintenance',mY,mN,mNA)
+  +card('#F0FDF4','#86EFAC','#166534','Sanitation',sY,sN,sNA)
+  +card('#F5F3FF','#DDD6FE','#4C1D95','GMP',gY,gN,gNA)
+  +card('#FFF7ED','#FED7AA','#7C2D12','Safety',sfY,sfN,sfNA)
+  +'</div>';
+}
+
+// ── CLOSURE SECTION ───────────────────────────────────────────
+function renderClosureSection(caF,cl){
+  if(!caF.length)return '<div class="no-data closure-wrap">No findings in this period to analyze.</div>';
+  var kpis='<div class="kpi-grid kpi-grid-6" style="background:#fff;padding:10px 12px 6px;border:.5px solid var(--border);border-top:none">'
+  +'<div class="scard sc-rate"><div class="scard-num">'+cl.compRate+'%</div><div class="scard-lbl">Completion rate</div><div class="scard-sub">'+cl.complete+' of '+cl.total+' closed</div></div>'
+  +'<div class="scard sc-ontime"><div class="scard-num">'+cl.onTime+'</div><div class="scard-lbl">Closed on time</div><div class="scard-sub">'+(cl.complete>0?cl.onTimeRate+'% of completed':'—')+'</div></div>'
+  +'<div class="scard sc-late"><div class="scard-num">'+cl.late+'</div><div class="scard-lbl">Closed late</div><div class="scard-sub">after due date</div></div>'
+  +'<div class="scard sc-op"><div class="scard-num">'+cl.stillOpen+'</div><div class="scard-lbl">Open / in progress</div><div class="scard-sub">within due date</div></div>'
+  +'<div class="scard sc-pd"><div class="scard-num">'+cl.pastDue+'</div><div class="scard-lbl">Past due</div><div class="scard-sub">no completion date</div></div>'
+  +'<div class="scard sc-avg"><div class="scard-num">'+(cl.avgDays!==null?cl.avgDays+'d':'—')+'</div><div class="scard-lbl">Avg days to close</div><div class="scard-sub">completed only</div></div>'
+  +'</div>';
+
+  var completed=caF.filter(function(r){var s=(r.status||'').toLowerCase();return s.indexOf('complete')!==-1||s.indexOf('closed')!==-1;});
+  if(!completed.length)return kpis+'<div class="no-data" style="background:#fff;border:.5px solid var(--border);border-top:none">No completed items yet in this period.</div>';
+
+  var tbl='<div class="closure-wrap"><table class="closure-table"><thead><tr>'
+  +'<th>CAR ID</th><th>Inspection item</th><th>NC Level</th><th>Due date</th><th>Completion date</th><th>Days to close</th><th>On time?</th>'
+  +'</tr></thead><tbody>';
+  completed.slice().sort(function(a,b){return (parseDate(b.completionDate)||0)-(parseDate(a.completionDate)||0);}).forEach(function(r){
+    var due=parseDate(r.dueDate),comp=parseDate(r.completionDate),nc=parseDate(r.ncDate);
+    var dv=nc&&comp?daysBetween(nc,comp):null;
+    var ot=due&&comp?comp<=due:null;
+    tbl+='<tr>'
+    +'<td><span class="car-id">'+esc(r.carId)+'</span></td>'
+    +'<td>'+esc(r.inspectionItem||r.description||'—')+'</td>'
+    +'<td><span class="zbadge '+levelClass(r.ncLevel)+'">'+esc(r.ncLevel||'Minor')+'</span></td>'
+    +'<td>'+esc(r.dueDate||'—')+'</td>'
+    +'<td>'+esc(r.completionDate||'—')+'</td>'
+    +'<td style="text-align:center">'+(dv!==null?dv+' days':'—')+'</td>'
+    +'<td style="text-align:center">'
+    +(ot===true?'<span class="st-pill st-cp">On time</span>':ot===false?'<span class="st-pill st-pd">Late</span>':'<span style="color:var(--muted)">—</span>')
+    +'</td></tr>';
+  });
+  return kpis+tbl+'</tbody></table></div>';
+}
+</script>
+</body>
+</html>
